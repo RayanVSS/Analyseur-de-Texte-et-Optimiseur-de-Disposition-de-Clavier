@@ -34,7 +34,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = 'belhassen.bencheikh.projet.cpoo5.App'
+    mainClass = 'App'
 }
 
 tasks.named('test') {
