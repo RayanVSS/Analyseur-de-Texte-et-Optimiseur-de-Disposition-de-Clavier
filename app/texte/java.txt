@@ -1,0 +1,1125 @@
+import java.io.*;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.function.*;
+import java.util.stream.*;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+
+public class ECommerceSystem {
+
+    public static void main(String[] args) {
+        System.out.println("Bienvenue dans le système de gestion de commerce électronique!");
+
+        ProductManager productManager = new ProductManager();
+        productManager.addProduct(new Electronics("Smartphone", 699.99, "TechBrand", 24));
+        productManager.addProduct(new Clothing("Jeans", 49.99, "DenimCo", "M", "Blue"));
+        productManager.addProduct(new Book("Java Programming", 39.99, "John Doe", "Education"));
+        productManager.addProduct(new Electronics("Laptop", 1299.99, "ComputeX", 36));
+
+        CustomerManager customerManager = new CustomerManager();
+        customerManager.addCustomer(new Customer("Alice Smith", "alice@example.com"));
+        customerManager.addCustomer(new Customer("Bob Johnson", "bob@example.com"));
+
+        OrderManager orderManager = new OrderManager(productManager, customerManager);
+        Order order1 = orderManager.createOrder("alice@example.com");
+        order1.addItem(productManager.getProductByName("Smartphone"), 1);
+        order1.addItem(productManager.getProductByName("Jeans"), 2);
+
+        Order order2 = orderManager.createOrder("bob@example.com");
+        order2.addItem(productManager.getProductByName("Laptop"), 1);
+        order2.addItem(productManager.getProductByName("Java Programming"), 3);
+
+        orderManager.processOrders();
+
+        // Génération de rapports
+        ReportGenerator reportGenerator = new ReportGenerator(orderManager, productManager, customerManager);
+        reportGenerator.generateSalesReport();
+        reportGenerator.generateInventoryReport();
+        reportGenerator.generateCustomerReport();
+
+        DataPersistence.saveData(productManager, customerManager, orderManager);
+
+        DataPersistence.loadData(productManager, customerManager, orderManager);
+
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        executor.submit(() -> {
+            orderManager.processPendingOrders();
+        });
+        executor.submit(() -> {
+            reportGenerator.generateSalesReport();
+        });
+
+        executor.shutdown();
+        try {
+            executor.awaitTermination(1, TimeUnit.MINUTES);
+        } catch (InterruptedException e) {
+            System.out.println("Interruption du traitement parallèle: " + e.getMessage());
+        }
+
+        System.out.println("Système de gestion de commerce électronique terminé.");
+    }
+
+    interface Product extends Serializable {
+        String getName();
+        double getPrice();
+        void displayInfo();
+    }
+
+    abstract static class AbstractProduct implements Product {
+        protected String name;
+        protected double price;
+
+        public AbstractProduct(String name, double price) {
+            this.name = name;
+            this.price = price;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public double getPrice() {
+            return price;
+        }
+
+        public abstract void displayInfo();
+    }
+
+    static class Electronics extends AbstractProduct {
+        private String brand;
+        private int warrantyMonths;
+
+        public Electronics(String name, double price, String brand, int warrantyMonths) {
+            super(name, price);
+            this.brand = brand;
+            this.warrantyMonths = warrantyMonths;
+        }
+
+        public String getBrand() {
+            return brand;
+        }
+
+        public int getWarrantyMonths() {
+            return warrantyMonths;
+        }
+
+        @Override
+        public void displayInfo() {
+            System.out.println("Électronique - Nom: " + name + ", Prix: " + price + ", Marque: " + brand + ", Garantie: " + warrantyMonths + " mois");
+        }
+    }
+
+    static class Clothing extends AbstractProduct {
+        private String size;
+        private String color;
+
+        public Clothing(String name, double price, String size, String color) {
+            super(name, price);
+            this.size = size;
+            this.color = color;
+        }
+
+        public String getSize() {
+            return size;
+        }
+
+        public String getColor() {
+            return color;
+        }
+
+        @Override
+        public void displayInfo() {
+            System.out.println("Vêtement - Nom: " + name + ", Prix: " + price + ", Taille: " + size + ", Couleur: " + color);
+        }
+    }
+
+    static class Book extends AbstractProduct {
+        private String author;
+        private String genre;
+
+        public Book(String name, double price, String author, String genre) {
+            super(name, price);
+            this.author = author;
+            this.genre = genre;
+        }
+
+        public String getAuthor() {
+            return author;
+        }
+
+        public String getGenre() {
+            return genre;
+        }
+
+        @Override
+        public void displayInfo() {
+            System.out.println("Livre - Titre: " + name + ", Prix: " + price + ", Auteur: " + author + ", Genre: " + genre);
+        }
+    }
+
+    static class ProductManager implements Serializable {
+        private List<Product> products;
+
+        public ProductManager() {
+            products = new ArrayList<>();
+        }
+
+        public void addProduct(Product product) {
+            products.add(product);
+            System.out.println("Produit ajouté: " + product.getName());
+        }
+
+        public Product getProductByName(String name) {
+            return products.stream()
+                    .filter(p -> p.getName().equalsIgnoreCase(name))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        public List<Product> getAllProducts() {
+            return products;
+        }
+    }
+
+    static class Customer implements Serializable {
+        private String name;
+        private String email;
+        private List<Order> orders;
+
+        public Customer(String name, String email) {
+            this.name = name;
+            this.email = email;
+            this.orders = new ArrayList<>();
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void addOrder(Order order) {
+            orders.add(order);
+        }
+
+        public List<Order> getOrders() {
+            return orders;
+        }
+    }
+
+    static class CustomerManager implements Serializable {
+        private List<Customer> customers;
+
+        public CustomerManager() {
+            customers = new ArrayList<>();
+        }
+
+        public void addCustomer(Customer customer) {
+            customers.add(customer);
+            System.out.println("Client ajouté: " + customer.getName());
+        }
+
+        public Customer getCustomerByEmail(String email) {
+            return customers.stream()
+                    .filter(c -> c.getEmail().equalsIgnoreCase(email))
+                    .findFirst()
+                    .orElse(null);
+        }
+
+        public List<Customer> getAllCustomers() {
+            return customers;
+        }
+    }
+
+    static class OrderItem implements Serializable {
+        private Product product;
+        private int quantity;
+
+        public OrderItem(Product product, int quantity) {
+            this.product = product;
+            this.quantity = quantity;
+        }
+
+        public Product getProduct() {
+            return product;
+        }
+
+        public int getQuantity() {
+            return quantity;
+        }
+
+        public double getTotalPrice() {
+            return product.getPrice() * quantity;
+        }
+    }
+
+    static class Order implements Serializable {
+        private static int counter = 1;
+        private int orderId;
+        private Customer customer;
+        private List<OrderItem> items;
+        private LocalDateTime orderDate;
+        private boolean processed;
+
+        public Order(Customer customer) {
+            this.orderId = counter++;
+            this.customer = customer;
+            this.items = new ArrayList<>();
+            this.orderDate = LocalDateTime.now();
+            this.processed = false;
+        }
+
+        public int getOrderId() {
+            return orderId;
+        }
+
+        public Customer getCustomer() {
+            return customer;
+        }
+
+        public List<OrderItem> getItems() {
+            return items;
+        }
+
+        public LocalDateTime getOrderDate() {
+            return orderDate;
+        }
+
+        public boolean isProcessed() {
+            return processed;
+        }
+
+        public void addItem(Product product, int quantity) {
+            items.add(new OrderItem(product, quantity));
+            System.out.println("Ajouté " + quantity + " x " + product.getName() + " à la commande " + orderId);
+        }
+
+        public double getTotalAmount() {
+            return items.stream()
+                    .mapToDouble(OrderItem::getTotalPrice)
+                    .sum();
+        }
+
+        public void process() {
+            // Simuler le traitement de la commande
+            this.processed = true;
+            System.out.println("Commande " + orderId + " traitée. Montant total: " + getTotalAmount());
+        }
+    }
+
+    static class OrderManager implements Serializable {
+        private List<Order> orders;
+        private ProductManager productManager;
+        private CustomerManager customerManager;
+
+        public OrderManager(ProductManager productManager, CustomerManager customerManager) {
+            this.orders = new ArrayList<>();
+            this.productManager = productManager;
+            this.customerManager = customerManager;
+        }
+
+        public Order createOrder(String customerEmail) {
+            Customer customer = customerManager.getCustomerByEmail(customerEmail);
+            if (customer == null) {
+                System.out.println("Client non trouvé: " + customerEmail);
+                return null;
+            }
+            Order order = new Order(customer);
+            orders.add(order);
+            customer.addOrder(order);
+            System.out.println("Commande créée avec l'ID: " + order.getOrderId() + " pour le client: " + customer.getName());
+            return order;
+        }
+
+        public List<Order> getAllOrders() {
+            return orders;
+        }
+
+        public void processOrders() {
+            orders.stream()
+                    .filter(order -> !order.isProcessed())
+                    .forEach(Order::process);
+        }
+
+        public void processPendingOrders() {
+            orders.stream()
+                    .filter(order -> !order.isProcessed())
+                    .forEach(order -> {
+                        // Simuler un délai de traitement
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            System.out.println("Interruption lors du traitement de la commande: " + e.getMessage());
+                        }
+                        order.process();
+                    });
+        }
+    }
+
+    static class ReportGenerator {
+        private OrderManager orderManager;
+        private ProductManager productManager;
+        private CustomerManager customerManager;
+
+        public ReportGenerator(OrderManager orderManager, ProductManager productManager, CustomerManager customerManager) {
+            this.orderManager = orderManager;
+            this.productManager = productManager;
+            this.customerManager = customerManager;
+        }
+
+        public void generateSalesReport() {
+            System.out.println("\n--- Rapport des Ventes ---");
+            Map<String, Double> salesByProduct = new HashMap<>();
+            orderManager.getAllOrders().forEach(order -> {
+                order.getItems().forEach(item -> {
+                    salesByProduct.merge(item.getProduct().getName(), item.getTotalPrice(), Double::sum);
+                });
+            });
+            salesByProduct.forEach((product, totalSales) -> {
+                System.out.println("Produit: " + product + " - Ventes Totales: " + totalSales);
+            });
+        }
+
+        public void generateInventoryReport() {
+            System.out.println("\n--- Rapport d'Inventaire ---");
+            // Pour simplifier, supposons que chaque vente réduit l'inventaire
+            // Dans une application réelle, il y aurait un suivi des stocks
+            Map<String, Integer> salesCount = new HashMap<>();
+            orderManager.getAllOrders().forEach(order -> {
+                order.getItems().forEach(item -> {
+                    salesCount.merge(item.getProduct().getName(), item.getQuantity(), Integer::sum);
+                });
+            });
+            salesCount.forEach((product, quantity) -> {
+                System.out.println("Produit: " + product + " - Quantité Vendue: " + quantity);
+            });
+        }
+
+        public void generateCustomerReport() {
+            System.out.println("\n--- Rapport des Clients ---");
+            customerManager.getAllCustomers().forEach(customer -> {
+                double totalSpent = customer.getOrders().stream()
+                        .mapToDouble(Order::getTotalAmount)
+                        .sum();
+                System.out.println("Client: " + customer.getName() + " - Email: " + customer.getEmail() + " - Dépenses Totales: " + totalSpent);
+            });
+        }
+    }
+
+    static class DataPersistence {
+        private static final String DATA_FILE = "ecommerce_data.ser";
+
+        public static void saveData(ProductManager productManager, CustomerManager customerManager, OrderManager orderManager) {
+            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(DATA_FILE))) {
+                oos.writeObject(productManager);
+                oos.writeObject(customerManager);
+                oos.writeObject(orderManager);
+                System.out.println("\nDonnées sauvegardées avec succès.");
+            } catch (IOException e) {
+                System.out.println("Erreur lors de la sauvegarde des données: " + e.getMessage());
+            }
+        }
+
+        public static void loadData(ProductManager productManager, CustomerManager customerManager, OrderManager orderManager) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(DATA_FILE))) {
+                ProductManager loadedProductManager = (ProductManager) ois.readObject();
+                CustomerManager loadedCustomerManager = (CustomerManager) ois.readObject();
+                OrderManager loadedOrderManager = (OrderManager) ois.readObject();
+
+                // Remplacer les données actuelles par les données chargées
+                productManager.getAllProducts().clear();
+                productManager.getAllProducts().addAll(loadedProductManager.getAllProducts());
+
+                customerManager.getAllCustomers().clear();
+                customerManager.getAllCustomers().addAll(loadedCustomerManager.getAllCustomers());
+
+                orderManager.getAllOrders().clear();
+                orderManager.getAllOrders().addAll(loadedOrderManager.getAllOrders());
+
+                System.out.println("Données chargées avec succès.");
+            } catch (IOException | ClassNotFoundException e) {
+                System.out.println("Erreur lors du chargement des données: " + e.getMessage());
+            }
+        }
+    }
+
+    @FunctionalInterface
+    interface DiscountStrategy {
+        double applyDiscount(double price);
+    }
+
+    static class DiscountUtil {
+        public static double seasonalDiscount(double price) {
+            return price * 0.9; // 10% de remise
+        }
+
+        public static double clearanceDiscount(double price) {
+            return price * 0.7; // 30% de remise
+        }
+    }
+
+    enum OrderStatus {
+        PENDING, PROCESSING, COMPLETED, CANCELLED
+    }
+
+    static class Cart<T extends Product> {
+        private List<T> items;
+
+        public Cart() {
+            items = new ArrayList<>();
+        }
+
+        public void addItem(T item) {
+            items.add(item);
+            System.out.println("Ajouté au panier: " + item.getName());
+        }
+
+        public void removeItem(T item) {
+            items.remove(item);
+            System.out.println("Retiré du panier: " + item.getName());
+        }
+
+        public List<T> getItems() {
+            return items;
+        }
+
+        public double getTotal() {
+            return items.stream().mapToDouble(Product::getPrice).sum();
+        }
+    }
+
+    interface NotificationService {
+        void sendNotification(Customer customer, String message);
+    }
+
+    static class EmailNotificationService implements NotificationService {
+        @Override
+        public void sendNotification(Customer customer, String message) {
+            System.out.println("Envoi d'un email à " + customer.getEmail() + ": " + message);
+        }
+    }
+
+    interface PaymentProcessor {
+        boolean processPayment(Customer customer, double amount);
+    }
+
+    static class PayPalProcessor implements PaymentProcessor {
+        @Override
+        public boolean processPayment(Customer customer, double amount) {
+            System.out.println("Traitement du paiement PayPal pour " + customer.getName() + ": " + amount + "€");
+            // Simuler le succès du paiement
+            return true;
+        }
+    }
+
+    static class PaymentService {
+        private PaymentProcessor paymentProcessor;
+
+        public PaymentService(PaymentProcessor paymentProcessor) {
+            this.paymentProcessor = paymentProcessor;
+        }
+
+        public boolean makePayment(Customer customer, double amount) {
+            return paymentProcessor.processPayment(customer, amount);
+        }
+    }
+
+    static class User {
+        protected String username;
+        protected String password;
+
+        public User(String username, String password) {
+            this.username = username;
+            this.password = password;
+        }
+
+        public boolean authenticate(String password) {
+            return this.password.equals(password);
+        }
+    }
+
+    static class Admin extends User {
+        public Admin(String username, String password) {
+            super(username, password);
+        }
+
+        public void manageProducts(ProductManager productManager) {
+            System.out.println("Administration des produits...");
+            productManager.getAllProducts().forEach(Product::displayInfo);
+        }
+    }
+
+    static class StatisticsUtil {
+        public static double calculateMean(List<Double> data) {
+            return data.stream().mapToDouble(Double::doubleValue).average().orElse(0.0);
+        }
+
+        public static double calculateMedian(List<Double> data) {
+            List<Double> sorted = data.stream().sorted().collect(Collectors.toList());
+            int size = sorted.size();
+            if (size == 0) return 0.0;
+            if (size % 2 == 1) {
+                return sorted.get(size / 2);
+            } else {
+                return (sorted.get(size / 2 - 1) + sorted.get(size / 2)) / 2.0;
+            }
+        }
+
+        public static double calculateStdDev(List<Double> data) {
+            double mean = calculateMean(data);
+            return Math.sqrt(data.stream().mapToDouble(d -> Math.pow(d - mean, 2)).average().orElse(0.0));
+        }
+    }
+
+    static class Promotion {
+        private String code;
+        private DiscountStrategy discountStrategy;
+
+        public Promotion(String code, DiscountStrategy discountStrategy) {
+            this.code = code;
+            this.discountStrategy = discountStrategy;
+        }
+
+        public String getCode() {
+            return code;
+        }
+
+        public double apply(double price) {
+            return discountStrategy.applyDiscount(price);
+        }
+    }
+
+    static class PromotionManager {
+        private List<Promotion> promotions;
+
+        public PromotionManager() {
+            promotions = new ArrayList<>();
+        }
+
+        public void addPromotion(Promotion promotion) {
+            promotions.add(promotion);
+            System.out.println("Promotion ajoutée: " + promotion.getCode());
+        }
+
+        public Optional<Promotion> getPromotionByCode(String code) {
+            return promotions.stream()
+                    .filter(p -> p.getCode().equalsIgnoreCase(code))
+                    .findFirst();
+        }
+    }
+
+    static class DateUtil {
+        public static String formatDate(LocalDateTime dateTime) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            return dateTime.format(formatter);
+        }
+    }
+
+    static class Review implements Serializable {
+        private Customer customer;
+        private Product product;
+        private int rating;
+        private String comment;
+        private LocalDateTime reviewDate;
+
+        public Review(Customer customer, Product product, int rating, String comment) {
+            this.customer = customer;
+            this.product = product;
+            this.rating = rating;
+            this.comment = comment;
+            this.reviewDate = LocalDateTime.now();
+        }
+
+        public Customer getCustomer() {
+            return customer;
+        }
+
+        public Product getProduct() {
+            return product;
+        }
+
+        public int getRating() {
+            return rating;
+        }
+
+        public String getComment() {
+            return comment;
+        }
+
+        public LocalDateTime getReviewDate() {
+            return reviewDate;
+        }
+
+        public void displayReview() {
+            System.out.println("Avis de " + customer.getName() + " sur " + product.getName() + ": " + rating + " étoiles. Commentaire: " + comment + ". Date: " + DateUtil.formatDate(reviewDate));
+        }
+    }
+
+    static class ReviewManager {
+        private List<Review> reviews;
+
+        public ReviewManager() {
+            reviews = new ArrayList<>();
+        }
+
+        public void addReview(Review review) {
+            reviews.add(review);
+            System.out.println("Avis ajouté pour le produit: " + review.getProduct().getName());
+        }
+
+        public List<Review> getReviewsByProduct(Product product) {
+            return reviews.stream()
+                    .filter(r -> r.getProduct().equals(product))
+                    .collect(Collectors.toList());
+        }
+
+        public void displayAllReviews() {
+            reviews.forEach(Review::displayReview);
+        }
+    }
+
+    static class CartManager {
+        private Map<Customer, Cart<Product>> carts;
+
+        public CartManager() {
+            carts = new HashMap<>();
+        }
+
+        public Cart<Product> getCart(Customer customer) {
+            return carts.computeIfAbsent(customer, k -> new Cart<>());
+        }
+
+        public void addToCart(Customer customer, Product product) {
+            Cart<Product> cart = getCart(customer);
+            cart.addItem(product);
+        }
+
+        public void removeFromCart(Customer customer, Product product) {
+            Cart<Product> cart = getCart(customer);
+            cart.removeItem(product);
+        }
+
+        public double checkout(Customer customer) {
+            Cart<Product> cart = getCart(customer);
+            double total = cart.getTotal();
+            cart.getItems().clear();
+            System.out.println("Panier de " + customer.getName() + " vidé après le paiement de " + total + "€.");
+            return total;
+        }
+    }
+
+    static class LoggerUtil {
+        public static void log(String message) {
+            System.out.println("[LOG - " + LocalDateTime.now() + "] " + message);
+        }
+    }
+
+    static class AdvancedPromotionManager extends PromotionManager {
+        private Map<String, LocalDate> promotionExpiry;
+
+        public AdvancedPromotionManager() {
+            super();
+            promotionExpiry = new HashMap<>();
+        }
+
+        public void addPromotion(Promotion promotion, LocalDate expiryDate) {
+            super.addPromotion(promotion);
+            promotionExpiry.put(promotion.getCode(), expiryDate);
+            System.out.println("Promotion " + promotion.getCode() + " expirera le " + expiryDate);
+        }
+
+        @Override
+        public Optional<Promotion> getPromotionByCode(String code) {
+            LocalDate expiry = promotionExpiry.get(code);
+            if (expiry != null && LocalDate.now().isAfter(expiry)) {
+                System.out.println("La promotion " + code + " a expiré.");
+                return Optional.empty();
+            }
+            return super.getPromotionByCode(code);
+        }
+    }
+
+    static class SMSNotificationService implements NotificationService {
+        @Override
+        public void sendNotification(Customer customer, String message) {
+            System.out.println("Envoi d'un SMS à " + customer.getName() + ": " + message);
+        }
+    }
+
+    static class MultiChannelNotificationService implements NotificationService {
+        private List<NotificationService> services;
+
+        public MultiChannelNotificationService() {
+            services = new ArrayList<>();
+        }
+
+        public void addService(NotificationService service) {
+            services.add(service);
+        }
+
+        @Override
+        public void sendNotification(Customer customer, String message) {
+            services.forEach(service -> service.sendNotification(customer, message));
+        }
+    }
+
+    static class InventoryManager {
+        private Map<Product, Integer> stockLevels;
+
+        public InventoryManager() {
+            stockLevels = new HashMap<>();
+        }
+
+        public void addStock(Product product, int quantity) {
+            stockLevels.merge(product, quantity, Integer::sum);
+            System.out.println("Ajouté " + quantity + " unités au stock de " + product.getName());
+        }
+
+        public boolean reduceStock(Product product, int quantity) {
+            Integer currentStock = stockLevels.get(product);
+            if (currentStock == null || currentStock < quantity) {
+                System.out.println("Stock insuffisant pour le produit: " + product.getName());
+                return false;
+            }
+            stockLevels.put(product, currentStock - quantity);
+            System.out.println("Réduit le stock de " + product.getName() + " de " + quantity + " unités.");
+            return true;
+        }
+
+        public void displayStockLevels() {
+            System.out.println("\n--- Niveaux de Stock ---");
+            stockLevels.forEach((product, stock) -> {
+                System.out.println("Produit: " + product.getName() + " - Stock: " + stock);
+            });
+        }
+    }
+
+    static class AdvancedStatistics {
+        public static void generatePriceDistribution(ProductManager productManager) {
+            System.out.println("\n--- Distribution des Prix des Produits ---");
+            double mean = StatisticsUtil.calculateMean(
+                    productManager.getAllProducts().stream()
+                            .map(Product::getPrice)
+                            .collect(Collectors.toList())
+            );
+            double median = StatisticsUtil.calculateMedian(
+                    productManager.getAllProducts().stream()
+                            .map(Product::getPrice)
+                            .collect(Collectors.toList())
+            );
+            double stdDev = StatisticsUtil.calculateStdDev(
+                    productManager.getAllProducts().stream()
+                            .map(Product::getPrice)
+                            .collect(Collectors.toList())
+            );
+            System.out.println("Moyenne: " + mean + "€, Médiane: " + median + "€, Écart Type: " + stdDev + "€");
+        }
+
+        public static void generateCustomerSpendingDistribution(CustomerManager customerManager) {
+            System.out.println("\n--- Distribution des Dépenses des Clients ---");
+            double mean = StatisticsUtil.calculateMean(
+                    customerManager.getAllCustomers().stream()
+                            .map(c -> c.getOrders().stream().mapToDouble(Order::getTotalAmount).sum())
+                            .collect(Collectors.toList())
+            );
+            double median = StatisticsUtil.calculateMedian(
+                    customerManager.getAllCustomers().stream()
+                            .map(c -> c.getOrders().stream().mapToDouble(Order::getTotalAmount).sum())
+                            .collect(Collectors.toList())
+            );
+            double stdDev = StatisticsUtil.calculateStdDev(
+                    customerManager.getAllCustomers().stream()
+                            .map(c -> c.getOrders().stream().mapToDouble(Order::getTotalAmount).sum())
+                            .collect(Collectors.toList())
+            );
+            System.out.println("Moyenne: " + mean + "€, Médiane: " + median + "€, Écart Type: " + stdDev + "€");
+        }
+    }
+
+    static class ReturnManager {
+        private List<Order> returns;
+
+        public ReturnManager() {
+            returns = new ArrayList<>();
+        }
+
+        public void processReturn(Order order) {
+            if (order.isProcessed()) {
+                returns.add(order);
+                System.out.println("Retour traité pour la commande ID: " + order.getOrderId());
+            } else {
+                System.out.println("La commande ID: " + order.getOrderId() + " n'est pas encore traitée.");
+            }
+        }
+
+        public void displayReturns() {
+            System.out.println("\n--- Retours ---");
+            returns.forEach(order -> {
+                System.out.println("Commande ID: " + order.getOrderId() + " par " + order.getCustomer().getName());
+            });
+        }
+    }
+
+    static class BundleOffer {
+        private String bundleName;
+        private List<Product> products;
+        private double bundlePrice;
+
+        public BundleOffer(String bundleName, List<Product> products, double bundlePrice) {
+            this.bundleName = bundleName;
+            this.products = products;
+            this.bundlePrice = bundlePrice;
+        }
+
+        public String getBundleName() {
+            return bundleName;
+        }
+
+        public List<Product> getProducts() {
+            return products;
+        }
+
+        public double getBundlePrice() {
+            return bundlePrice;
+        }
+
+        public void displayBundle() {
+            System.out.println("Offre Groupée: " + bundleName + " - Prix Bundle: " + bundlePrice + "€");
+            products.forEach(p -> System.out.println("  - " + p.getName()));
+        }
+    }
+
+    static class BundleManager {
+        private List<BundleOffer> bundles;
+
+        public BundleManager() {
+            bundles = new ArrayList<>();
+        }
+
+        public void addBundle(BundleOffer bundle) {
+            bundles.add(bundle);
+            System.out.println("Offre groupée ajoutée: " + bundle.getBundleName());
+        }
+
+        public void displayAllBundles() {
+            System.out.println("\n--- Offres Groupées ---");
+            bundles.forEach(BundleOffer::displayBundle);
+        }
+    }
+
+    static class SeasonalPromotion extends Promotion {
+        private Season season;
+
+        public SeasonalPromotion(String code, DiscountStrategy discountStrategy, Season season) {
+            super(code, discountStrategy);
+            this.season = season;
+        }
+
+        public Season getSeason() {
+            return season;
+        }
+
+        @Override
+        public void displayInfo() {
+            System.out.println("Promotion Saisonnière - Code: " + code + ", Saison: " + season);
+        }
+    }
+
+    enum Season {
+        PRINTEMPS, ÉTÉ, AUTOMNE, HIVER
+    }
+
+    static class BulkDiscountPromotion extends Promotion {
+        private int minimumQuantity;
+        private double discountRate;
+
+        public BulkDiscountPromotion(String code, int minimumQuantity, double discountRate) {
+            super(code, price -> price * (1 - discountRate));
+            this.minimumQuantity = minimumQuantity;
+            this.discountRate = discountRate;
+        }
+
+        public int getMinimumQuantity() {
+            return minimumQuantity;
+        }
+
+        public double getDiscountRate() {
+            return discountRate;
+        }
+
+        @Override
+        public void displayInfo() {
+            System.out.println("Promotion Remise en Volume - Code: " + code + ", Quantité Minimum: " + minimumQuantity + ", Taux de Remise: " + (discountRate * 100) + "%");
+        }
+    }
+
+    static class TimedPromotionManager extends AdvancedPromotionManager {
+        // Ajout de fonctionnalités spécifiques si nécessaire
+    }
+
+    static class FilteredReviewManager extends ReviewManager {
+        public List<Review> getReviewsByRating(int rating) {
+            return super.reviews.stream()
+                    .filter(r -> r.getRating() == rating)
+                    .collect(Collectors.toList());
+        }
+    }
+
+    interface SortStrategy {
+        void sort(List<Product> products);
+    }
+
+    static class SortByPriceAscending implements SortStrategy {
+        @Override
+        public void sort(List<Product> products) {
+            products.sort(Comparator.comparingDouble(Product::getPrice));
+            System.out.println("Produits triés par prix croissant.");
+        }
+    }
+
+    static class SortByPriceDescending implements SortStrategy {
+        @Override
+        public void sort(List<Product> products) {
+            products.sort(Comparator.comparingDouble(Product::getPrice).reversed());
+            System.out.println("Produits triés par prix décroissant.");
+        }
+    }
+
+    static class ProductSorter {
+        private SortStrategy sortStrategy;
+
+        public ProductSorter(SortStrategy sortStrategy) {
+            this.sortStrategy = sortStrategy;
+        }
+
+        public void setSortStrategy(SortStrategy sortStrategy) {
+            this.sortStrategy = sortStrategy;
+        }
+
+        public void sortProducts(List<Product> products) {
+            sortStrategy.sort(products);
+        }
+    }
+
+    static class BundleCart extends Cart<Product> {
+        private BundleManager bundleManager;
+
+        public BundleCart(BundleManager bundleManager) {
+            super();
+            this.bundleManager = bundleManager;
+        }
+
+        public void addBundle(String bundleName) {
+            Optional<BundleOffer> bundleOpt = bundleManager.bundles.stream()
+                    .filter(b -> b.getBundleName().equalsIgnoreCase(bundleName))
+                    .findFirst();
+            if (bundleOpt.isPresent()) {
+                BundleOffer bundle = bundleOpt.get();
+                bundle.getProducts().forEach(this::addItem);
+                System.out.println("Ajouté le bundle: " + bundleName + " au panier.");
+            } else {
+                System.out.println("Bundle non trouvé: " + bundleName);
+            }
+        }
+    }
+
+    static class DeliveryManager {
+        public void scheduleDelivery(Order order, LocalDate deliveryDate) {
+            System.out.println("Livraison programmée pour la commande ID: " + order.getOrderId() + " le " + deliveryDate);
+        }
+    }
+
+    static class DeliveryOption {
+        private String name;
+        private double cost;
+        private int estimatedDays;
+
+        public DeliveryOption(String name, double cost, int estimatedDays) {
+            this.name = name;
+            this.cost = cost;
+            this.estimatedDays = estimatedDays;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public double getCost() {
+            return cost;
+        }
+
+        public int getEstimatedDays() {
+            return estimatedDays;
+        }
+
+        public void displayOption() {
+            System.out.println("Option de Livraison: " + name + " - Coût: " + cost + "€ - Estimation: " + estimatedDays + " jours");
+        }
+    }
+
+    static class DeliveryOptionManager {
+        private List<DeliveryOption> deliveryOptions;
+
+        public DeliveryOptionManager() {
+            deliveryOptions = new ArrayList<>();
+        }
+
+        public void addDeliveryOption(DeliveryOption option) {
+            deliveryOptions.add(option);
+            System.out.println("Option de livraison ajoutée: " + option.getName());
+        }
+
+        public void displayAllOptions() {
+            System.out.println("\n--- Options de Livraison ---");
+            deliveryOptions.forEach(DeliveryOption::displayOption);
+        }
+
+        public Optional<DeliveryOption> getOptionByName(String name) {
+            return deliveryOptions.stream()
+                    .filter(o -> o.getName().equalsIgnoreCase(name))
+                    .findFirst();
+        }
+    }
+
+    static class PersonalizedNotificationService implements NotificationService {
+        private String template;
+
+        public PersonalizedNotificationService(String template) {
+            this.template = template;
+        }
+
+        @Override
+        public void sendNotification(Customer customer, String message) {
+            String personalizedMessage = template.replace("{name}", customer.getName()).replace("{message}", message);
+            System.out.println("Envoi d'une notification personnalisée à " + customer.getEmail() + ": " + personalizedMessage);
+        }
+    }
+
+    static class SentimentAnalyzer {
+        public static String analyzeSentiment(String comment) {
+            // Simuler une analyse de sentiment simple
+            String lower = comment.toLowerCase();
+            if (lower.contains("excellent") || lower.contains("parfait") || lower.contains("fantastique")) {
+                return "Positif";
+            } else if (lower.contains("mauvais") || lower.contains("terrible") || lower.contains("déçu")) {
+                return "Négatif";
+            } else {
+                return "Neutre";
+            }
+        }
+    }
+
+    static class SentimentStatistics {
+        public static void generateSentimentReport(ReviewManager reviewManager) {
+            System.out.println("\n--- Rapport de Sentiment des Avis ---");
+            Map<String, Long> sentimentCounts = reviewManager.reviews.stream()
+                    .collect(Collectors.groupingBy(r -> SentimentAnalyzer.analyzeSentiment(r.getComment()), Collectors.counting()));
+            sentimentCounts.forEach((sentiment, count) -> {
+                System.out.println("Sentiment: " + sentiment + " - Nombre d'avis: " + count);
+            });
+        }
+    }
+}

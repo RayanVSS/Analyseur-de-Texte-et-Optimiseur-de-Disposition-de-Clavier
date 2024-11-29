@@ -51,14 +51,20 @@ public class Analyseur  {
 
 
     public void afficher(HashMap<String,Integer> map) {
+        System.out.println("######");
         for (String key : map.keySet()) {
             System.out.println(key + " : " + map.get(key));
         }
+        System.out.println("######");
     }
 
     public void create_json(String path) {
         Jsonfile<String,Integer> jsonfile = new Jsonfile<String,Integer>();
         jsonfile.create_json(map,path);
+    }
+
+    public HashMap<String, Integer> getMap() {
+        return map;
     }
 
     public static void main(String[] args) {
