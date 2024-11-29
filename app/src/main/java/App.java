@@ -1,9 +1,14 @@
+import java.util.HashMap;
 import java.util.Scanner;
 import config.Analyseur;
+import config.Evaluateur;
 import utils.FileCounter;
 import utils.Readfile;
+import utils.Jsonfile;
 
 public class App {
+    public static Jsonfile<String, Integer> jsonfile = new Jsonfile<String, Integer>();
+    public static Analyseur analyseur;
 
     public static void clear() {
         System.out.print("\033[H\033[2J");
@@ -55,7 +60,7 @@ public class App {
             } else {
                 clear();
                 System.out.println("Entree invalide ! un entier est attendu.");
-                scanner.next(); 
+                scanner.next();
             }
         } while (choice < 1 || choice > 4);
         return choice;
@@ -69,17 +74,35 @@ public class App {
             switch (choix) {
                 case 1:
                     clear();
+                    // fichier et nombres d'occurence
                     String file = FileCounter.FileSelector();
-                    if (file == null) break;
+                    if (file == null)
+                        break;
                     int nb_occurence = IntSelector();
-                    Analyseur analyseur = new Analyseur(Readfile.readFile(file), nb_occurence);
+
+                    // analyseur
+                    analyseur = new Analyseur(Readfile.readFile(file), nb_occurence);
                     analyseur.analyse();
                     analyseur.afficher(analyseur.getMap());
+
+                    // json
+                    jsonfile.create_json(analyseur.getMap(),
+                            FileCounter.getTerminalLocation() + "/resultat/analyseur.json");
                     break;
                 case 2:
                     clear();
-                    System.out.println("🔒");
+                    String resultFile = FileCounter.getTerminalLocation() + "/resultat/analyseur.json";
+                    // Charger les statistiques d'occurrences
+                    HashMap<String, Integer> stats = Jsonfile.readJsonAsMapStringInteger(resultFile);
+                    String dispositionPath = FileCounter.getTerminalLocation() + "/resultat/azerty.json";
+                    // Charger la disposition de clavier
+                    HashMap<Character, String> disposition = Jsonfile.readJsonAsMap(dispositionPath);
+
+                    Evaluateur evaluateur = new Evaluateur(stats, disposition);
+                    evaluateur.evaluer();
+                    evaluateur.afficherScores();
                     break;
+
                 case 3:
                     clear();
                     System.out.println("🔒");

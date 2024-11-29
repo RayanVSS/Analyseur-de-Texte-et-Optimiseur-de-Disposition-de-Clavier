@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Readfile {
-    
+
     public static String readFile(String filePath) {
         StringBuilder content = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
@@ -18,7 +18,6 @@ public class Readfile {
         }
         return content.toString();
     }
-
 
     public static void main(String[] args) {
         System.out.println(readFile("app/src/main/java/config/Analyseur.java"));
