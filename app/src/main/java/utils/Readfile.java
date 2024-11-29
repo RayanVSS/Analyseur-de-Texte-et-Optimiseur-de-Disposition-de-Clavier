@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class Readfile {
-    
+
     public static String readFile(String filePath) {
         StringBuilder content = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
