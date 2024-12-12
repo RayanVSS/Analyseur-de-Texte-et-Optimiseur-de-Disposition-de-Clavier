@@ -29,22 +29,10 @@ public class Analyseur {
             occurence = message.substring(i, i + nb_occurence);
 
             if (map.containsKey(occurence)) {
-                continue;
+                map.put(occurence, map.get(occurence) + 1);
+            } else {
+                map.put(occurence, 1);
             }
-
-            for (int j = 0; j < message.length(); j++) {
-                if (j + nb_occurence >= message.length()) {
-                    break;
-                }
-                if (occurence.equals(message.substring(j, j + nb_occurence))) {
-                    if (map.containsKey(occurence)) {
-                        map.put(occurence, map.get(occurence) + 1);
-                    } else {
-                        map.put(occurence, 1);
-                    }
-                }
-            }
-
         }
     }
 
