@@ -19,10 +19,14 @@ dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation libs.junit.jupiter
 
+
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
     // This dependency is used by the application.
     implementation libs.guava
+
+    implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+    implementation 'com.google.code.gson:gson:2.8.9'
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
@@ -32,9 +36,14 @@ java {
     }
 }
 
+tasks.named('run') {
+    standardInput = System.in
+}
+
+
 application {
     // Define the main class for the application.
-    mainClass = 'belhassen.bencheikh.projet.cpoo5.App'
+    mainClass = 'App'
 }
 
 tasks.named('test') {
