@@ -8,7 +8,6 @@ import utils.Jsonfile;
 
 public class App {
     public static Jsonfile<String, Integer> jsonfile = new Jsonfile<String, Integer>();
-    public static Analyseur analyseur;
 
     public static void clear() {
         System.out.print("\033[H\033[2J");
@@ -75,20 +74,37 @@ public class App {
                 case 1:
                     clear();
                     // fichier et nombres d'occurence
-                    String file = FileCounter.FileSelector();
-                    if (file == null)
-                        break;
+                    String[] files = FileCounter.FileSelector();
                     int nb_occurence = IntSelector();
+                    HashMap<String, Integer> map = new HashMap<String, Integer>();
 
-                    // analyseur
-                    analyseur = new Analyseur(Readfile.readFile(file), nb_occurence);
-                    analyseur.analyse();
-                    analyseur.afficher(analyseur.getMap());
+                    for (int i=0;i<files.length;i++){
 
-                    // json
-                    jsonfile.create_json(analyseur.getMap(),
-                            FileCounter.getTerminalLocation() + "/resultat/analyseur.json");
-                    break;
+                        String file = files[i];
+                        if (files[i]==null){
+                            continue;
+                        }
+
+                        Thread thread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Analyseur analyseur = new Analyseur(Readfile.readFile(file), nb_occurence);
+                                analyseur.analyse();
+                                analyseur.getMap().forEach((key, value) -> {
+                                    map.merge(key, value, Integer::sum);
+                                });
+
+                            }
+                        });
+                        thread.start();
+                        try {
+                            thread.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    Analyseur.afficher(map);
+                    jsonfile.create_json(map,FileCounter.getTerminalLocation() + "/resultat/analyseur.json");
                 case 2:
                     clear();
                     String resultFile = FileCounter.getTerminalLocation() + "/resultat/analyseur.json";

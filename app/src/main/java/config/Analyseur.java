@@ -36,7 +36,7 @@ public class Analyseur {
         }
     }
 
-    public void afficher(HashMap<String, Integer> map) {
+    public static void afficher(HashMap<String, Integer> map) {
         System.out.println("######");
         for (String key : map.keySet()) {
             System.out.println(key + " : " + map.get(key));

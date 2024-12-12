@@ -55,17 +55,22 @@ public class FileCounter {
     }
 
 
-    public static String FileSelector() {
+    public static String[] FileSelector() {
         Scanner scanner = new Scanner(System.in);
         FileCounter.FileCounterRun();
         System.out.println("Entrez le chemin du fichier : ");
         String filePath = scanner.nextLine();
-        File file = new File(getTerminalLocation() + "/texte/" + filePath);
-        if (!file.exists()) {
-            System.out.println("Le fichier n'existe pas.");
-            return null;
+        String[] tab=filePath.split(" ");
+        for (int i=0; i<tab.length; i++){
+            File file = new File(getTerminalLocation() + "/texte/" + tab[i]);
+            if (!file.exists()) {
+                System.out.println("Le fichier "+tab[i]+" n'existe pas.");
+                tab[i]=null;
+            }else{
+                tab[i]=getTerminalLocation()+ "/texte/" +tab[i];
+            }
         }
-        return getTerminalLocation()+ "/texte/" + filePath;
+        return tab;
     }
 
     // Méthode principale pour tester la classe
