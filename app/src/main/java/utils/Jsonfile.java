@@ -1,6 +1,7 @@
 package utils;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.io.FileWriter;
 import java.io.IOException;
 import org.json.simple.JSONObject;
@@ -9,6 +10,13 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
+
+import config.Evaluateur;
+
 import java.lang.reflect.Type;
 
 public class Jsonfile<T1, T2> {
@@ -61,5 +69,34 @@ public class Jsonfile<T1, T2> {
         }
     }
 
+ public static HashMap<Character, Evaluateur.TouchInfo> loadDispositionFromJson(String dispositionPath) {
+        HashMap<Character, Evaluateur.TouchInfo> dispositionMap = new HashMap<>();
+        
+        try (FileReader fr = new FileReader(dispositionPath);
+             JsonReader jr = new JsonReader(fr)) {
+            JsonObject root = JsonParser.parseReader(jr).getAsJsonObject();
+            JsonObject dispoObject = root.getAsJsonObject("disposition");
+
+            for (Map.Entry<String, JsonElement> entry : dispoObject.entrySet()) {
+                String key = entry.getKey();
+                JsonObject value = entry.getValue().getAsJsonObject();
+
+                int rangee = value.get("rangee").getAsInt();
+                int colonne = value.get("colonne").getAsInt();
+                String doigt = value.get("doigt").getAsString();
+                boolean home = value.get("home").getAsBoolean();
+
+
+                char c = key.charAt(0);
+                Evaluateur.TouchInfo info = new Evaluateur.TouchInfo(rangee, colonne, doigt, home);
+                dispositionMap.put(c, info);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return dispositionMap;
+    }
 
 }

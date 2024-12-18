@@ -89,16 +89,17 @@ public class App {
                     jsonfile.create_json(analyseur.getMap(),
                             FileCounter.getTerminalLocation() + "/resultat/analyseur.json");
                     break;
-                case 2:
+                    case 2:
                     clear();
                     String resultFile = FileCounter.getTerminalLocation() + "/resultat/analyseur.json";
                     // Charger les statistiques d'occurrences
                     HashMap<String, Integer> stats = Jsonfile.readJsonAsMapStringInteger(resultFile);
-                    String dispositionPath = FileCounter.getTerminalLocation() + "/resultat/azerty.json";
-                    // Charger la disposition de clavier
-                    HashMap<Character, String> disposition = Jsonfile.readJsonAsMap(dispositionPath);
 
-                    Evaluateur evaluateur = new Evaluateur(stats, disposition);
+                    String dispositionPath = FileCounter.getTerminalLocation() + "/resultat/azerty.json";
+                    HashMap<Character, Evaluateur.TouchInfo> dispoMap = Jsonfile.loadDispositionFromJson(dispositionPath);
+
+                    // Créer l'évaluateur avec les stats et la disposition chargée
+                    Evaluateur evaluateur = new Evaluateur(stats, dispoMap);
                     evaluateur.evaluer();
                     evaluateur.afficherScores();
                     break;
