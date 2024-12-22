@@ -55,7 +55,7 @@ public class Jsonfile<T1, T2> {
             return new Gson().fromJson(reader, type);
         } catch (IOException e) {
             e.printStackTrace();
-            return new HashMap<>();
+            return null;
         }
     }
     
@@ -64,8 +64,8 @@ public class Jsonfile<T1, T2> {
             Type type = new TypeToken<HashMap<String, Integer>>() {}.getType();
             return new Gson().fromJson(reader, type);
         } catch (IOException e) {
-            e.printStackTrace();
-            return new HashMap<>();
+           System.out.println("Erreur lors de la lecture du fichier : " + filePath );
+            return null;
         }
     }
 
@@ -97,6 +97,31 @@ public class Jsonfile<T1, T2> {
         }
         
         return dispositionMap;
+    }
+
+    public static void saveDispositionToJson(HashMap<Character, Evaluateur.TouchInfo> disposition, String dispositionPath) {
+        JsonObject dispoObject = new JsonObject();
+        for (Map.Entry<Character, Evaluateur.TouchInfo> entry : disposition.entrySet()) {
+            char key = entry.getKey();
+            Evaluateur.TouchInfo value = entry.getValue();
+
+            JsonObject infoObject = new JsonObject();
+            infoObject.addProperty("rangee", value.getRangee());
+            infoObject.addProperty("colonne", value.getColonne());
+            infoObject.addProperty("doigt", value.getDoigt());
+            infoObject.addProperty("home", value.isHome());
+
+            dispoObject.add(String.valueOf(key), infoObject);
+        }
+
+        JsonObject root = new JsonObject();
+        root.add("disposition", dispoObject);
+
+        try (FileWriter writer = new FileWriter(dispositionPath)) {
+            writer.write(root.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -81,6 +81,10 @@ public class Evaluateur {
      * NE FAIT PAS L'AFFICHAGE DES SCORES
      */
     public void evaluer() {
+        if (nGramMap == null || disposition == null || nGramMap.isEmpty() || disposition.isEmpty()) {
+            System.out.println("Erreur : n-grammes ou disposition non initialisés");
+            return;
+        }
         for (Map.Entry<String, Integer> entry : nGramMap.entrySet()) {
             String nGram = entry.getKey();
             int freq = entry.getValue();
@@ -330,6 +334,19 @@ public class Evaluateur {
                     double percent = (double) entry.getValue() / total * 100;
                     System.out.println(entry.getKey() + " : " + String.format("%.2f", percent) + "%");
                 });
+    }
+
+    public double getScoreTotal() {
+        double score = 0;
+        for (String key : scores.keySet()) {
+            if (key.equals("SFB")||key.equals("ciseaux")||key.equals("LSB")||key.equals("alternance")||key.equals("roulement")||key.equals("mauvaise_redirection")||key.equals("redirection")||key.equals("SKS")){
+                score -= scores.get(key);
+            }
+            else{
+                score += scores.get(key);
+            }
+        }
+        return score;
     }
 
 }

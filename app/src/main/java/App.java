@@ -2,6 +2,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 import config.Analyseur;
 import config.Evaluateur;
+import config.Optimisateur;
 import utils.FileCounter;
 import utils.Readfile;
 import utils.Jsonfile;
@@ -109,8 +110,13 @@ public class App {
                 case 2:
                     clear();
                     String resultFile = FileCounter.getTerminalLocation() + "/resultat/analyseur.json";
+
                     // Charger les statistiques d'occurrences
                     HashMap<String, Integer> stats = Jsonfile.readJsonAsMapStringInteger(resultFile);
+
+                    if (stats == null) {
+                        break;
+                    }
 
                     String dispositionPath = FileCounter.getTerminalLocation() + "/resultat/azerty.json";
                     HashMap<Character, Evaluateur.TouchInfo> dispoMap = Jsonfile.loadDispositionFromJson(dispositionPath);
@@ -123,7 +129,18 @@ public class App {
 
                 case 3:
                     clear();
-                    System.out.println("🔒");
+                    resultFile = FileCounter.getTerminalLocation() + "/resultat/analyseur.json";
+
+                    // Charger les statistiques d'occurrences
+                    stats = Jsonfile.readJsonAsMapStringInteger(resultFile);
+
+                    if (stats == null) {
+                        break;
+                    }
+
+                    Optimisateur optimisateur = new Optimisateur(stats);
+                    optimisateur.optimiser();
+                    
                     break;
                 case 4:
                     clear();
