@@ -85,10 +85,11 @@ public class Jsonfile<T1, T2> {
                 int colonne = value.get("colonne").getAsInt();
                 String doigt = value.get("doigt").getAsString();
                 boolean home = value.get("home").getAsBoolean();
+                boolean shift = value.get("shift").getAsBoolean();
 
 
                 char c = key.charAt(0);
-                Evaluateur.TouchInfo info = new Evaluateur.TouchInfo(rangee, colonne, doigt, home);
+                Evaluateur.TouchInfo info = new Evaluateur.TouchInfo(rangee, colonne, doigt, home, shift);
                 dispositionMap.put(c, info);
             }
 
