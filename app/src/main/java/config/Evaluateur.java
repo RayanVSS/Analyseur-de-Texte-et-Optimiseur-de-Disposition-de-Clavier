@@ -5,26 +5,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.checkerframework.checker.units.qual.s;
+
 public class Evaluateur {
 
     /*
-    * classe interne pour stocker les informations sur les touches
-    *   rangee : la rangee de la touche
-    *   colonne : la colonne de la touche
-    *   doigt : le doigt utilisé pour appuyer sur la touche
-    *   home : position de doigt au repos
-    */
+     * classe interne pour stocker les informations sur les touches
+     * rangee : la rangee de la touche
+     * colonne : la colonne de la touche
+     * doigt : le doigt utilisé pour appuyer sur la touche
+     * home : position de doigt au repos
+     */
     public static class TouchInfo {
         private int rangee;
         private int colonne;
         private String doigt;
         private boolean home;
 
-        public TouchInfo(int rangee, int colonne, String doigt, boolean home) {
+        // Ajout du champ shift en optionnel :
+        // Il peut être absent du JSON, dans ce cas on le considère false par défaut.
+        private boolean shift;
+
+        // Constructeur :
+        public TouchInfo(int rangee, int colonne, String doigt, boolean home, boolean shift) {
             this.rangee = rangee;
             this.colonne = colonne;
             this.doigt = doigt;
             this.home = home;
+            this.shift = shift;
         }
 
         public int getRangee() {
@@ -42,13 +50,18 @@ public class Evaluateur {
         public boolean isHome() {
             return home;
         }
+
+        public boolean isShift() {
+            return shift;
+        }
     }
 
     private HashMap<String, Integer> nGramMap; // Map des n-grammes
     private HashMap<Character, TouchInfo> disposition; // Map du clavier
-    
-    /** Map des scores a utiliser pour la partie 3 avec:
-     * - inconue (rien) 
+
+    /**
+     * Map des scores a utiliser pour la partie 3 avec:
+     * - inconue (rien)
      * - SFB (+) (same finger bigram)
      * - ciseaux (+)
      * - LSB (+) (left shift bigram)
@@ -60,8 +73,8 @@ public class Evaluateur {
      * - autre_bigramme (-)
      * - autre_trigramme (-)
      * - tout les doitgs du clavier (depend du pourcentage)
-    */
-    private HashMap<String, Integer> scores; 
+     */
+    private HashMap<String, Integer> scores;
 
     // Compteurs des mains
     private int countLeftHand = 0;
@@ -88,27 +101,74 @@ public class Evaluateur {
         for (Map.Entry<String, Integer> entry : nGramMap.entrySet()) {
             String nGram = entry.getKey();
             int freq = entry.getValue();
-            List<String> categories = analyserMouvement(nGram, freq);
+            List<Character> expanded = expandNgram(nGram); 
+
+            // si la séquence dépasse 3 touches, on ignore
+            if (expanded.size() == 0 || expanded.size() > 3) {
+                continue;
+            }
+
+            List<String> categories;
+            switch (expanded.size()) {
+                case 1:
+                    categories = analyserMonogramme(String.valueOf(expanded.get(0)), freq);
+                    break;
+                case 2:
+                    categories = analyserBigramme("" + expanded.get(0) + expanded.get(1), freq);
+                    break;
+                case 3:
+                    categories = analyserTrigramme("" + expanded.get(0) + expanded.get(1) + expanded.get(2), freq);
+                    break;
+                default:
+                    categories = new ArrayList<>();
+                    categories.add("inconnu");
+            }
+
             for (String cat : categories) {
                 scores.put(cat, scores.getOrDefault(cat, 0) + freq);
             }
         }
     }
 
-    // trie les n-grammes en fonction de leur mouvement 
-    private List<String> analyserMouvement(String nGram, int freq) {
-        switch (nGram.length()) {
-            case 1:
-                return analyserMonogramme(nGram, freq);
-            case 2:
-                return analyserBigramme(nGram, freq);
-            case 3:
-                return analyserTrigramme(nGram, freq);
-            default:
-                List<String> cat = new ArrayList<>();
-                cat.add("inconnu");
-                return cat;
+    // Nouvelle méthode pour transformer un n-gramme en liste de caractères
+    // tout en gérant la transformation des majuscules en minuscules (sans SHIFT)
+    // et l'option shift=true éventuellement définie dans le JSON.
+    private List<Character> expandNgram(String ngram) {
+        List<Character> result = new ArrayList<>();
+        for (int i = 0; i < ngram.length(); i++) {
+            char c = ngram.charAt(i);
+            List<Character> expandedChars = convertChar(c);
+            result.addAll(expandedChars);
         }
+        return result;
+    }
+
+    /**
+     * Convertit un caractère en sa (ou ses) touche(s) de base.
+     * Les modifications pour les majuscules :
+     * - Si c est majuscule, on le convertit directement en minuscule
+     * Pour shift=true dans le JSON on ajoute char SHIFT '¤',
+     */
+    private List<Character> convertChar(char c) {
+        List<Character> list = new ArrayList<>();
+
+        if (Character.isUpperCase(c)) {
+            c = Character.toLowerCase(c);
+        }
+        TouchInfo info = disposition.get(c);
+
+        if (info == null) {
+            list.add(c);
+            return list;
+        }
+        // si shift est activé pour ce caractère => on ajoute SHIFT en plus
+        // '¤' pour SHIFT
+        if (info.isShift()) {
+            list.add('¤');
+        }
+        // on ajoute le caractère final
+        list.add(c);
+        return list;
     }
 
     /**
@@ -117,7 +177,8 @@ public class Evaluateur {
      * - analyser le doigt utilisé pour appuyer sur la touche
      * - incrémenter les compteurs des mains
      * - incrémenter les compteurs des doigts
-     * - retourner le doit utilisé ou "inconnu" si la touche n'est pas dans la disposition
+     * - retourner le doit utilisé ou "inconnu" si la touche n'est pas dans la
+     * disposition
      */
     private List<String> analyserMonogramme(String mono, int freq) {
         List<String> categories = new ArrayList<>();
@@ -128,16 +189,15 @@ public class Evaluateur {
             return categories;
         }
 
-        //compteurs des mains
+        // compteurs des mains
         if (isLeftHand(info)) {
             countLeftHand += freq;
         } else {
             countRightHand += freq;
         }
 
-        //compteur du doigt 
+        // compteur du doigt
         fingerCount.put(info.getDoigt(), fingerCount.getOrDefault(info.getDoigt(), 0) + freq);
-
 
         categories.add(info.getDoigt());
         return categories;
@@ -169,7 +229,7 @@ public class Evaluateur {
             return categories;
         }
 
-        // Incrémenter les compteurs des mains 
+        // Incrémenter les compteurs des mains
         if (isLeftHand(i1)) {
             countLeftHand += freq;
         } else {
@@ -182,7 +242,7 @@ public class Evaluateur {
             countRightHand += freq;
         }
 
-        // Incrémenter les compteurs des doigts 
+        // Incrémenter les compteurs des doigts
         fingerCount.put(i1.getDoigt(), fingerCount.getOrDefault(i1.getDoigt(), 0) + freq);
         fingerCount.put(i2.getDoigt(), fingerCount.getOrDefault(i2.getDoigt(), 0) + freq);
 
@@ -194,17 +254,21 @@ public class Evaluateur {
         boolean alternance = !sameHand;
         boolean roulement = sameHand && isRoulement(i1, i2);
 
-        if (sfb) categories.add("SFB");
-        if (ciseaux) categories.add("ciseaux");
-        if (lsb) categories.add("LSB");
-        if (alternance) categories.add("alternance");
-        if (roulement) categories.add("roulement");
+        if (sfb)
+            categories.add("SFB");
+        if (ciseaux)
+            categories.add("ciseaux");
+        if (lsb)
+            categories.add("LSB");
+        if (alternance)
+            categories.add("alternance");
+        if (roulement)
+            categories.add("roulement");
 
-        if (categories.isEmpty()) categories.add("autre_bigramme");
+        if (categories.isEmpty())
+            categories.add("autre_bigramme");
         return categories;
     }
-
-
 
     /**
      * Analyse un Trigramme
@@ -251,7 +315,7 @@ public class Evaluateur {
             countRightHand += freq;
         }
 
-        // Incrémenter les compteurs des doigts 
+        // Incrémenter les compteurs des doigts
         fingerCount.put(i1.getDoigt(), fingerCount.getOrDefault(i1.getDoigt(), 0) + freq);
         fingerCount.put(i2.getDoigt(), fingerCount.getOrDefault(i2.getDoigt(), 0) + freq);
         fingerCount.put(i3.getDoigt(), fingerCount.getOrDefault(i3.getDoigt(), 0) + freq);
@@ -260,11 +324,14 @@ public class Evaluateur {
         boolean mauvaiseRedirection = redirection && noIndexInTriple(i1, i2, i3);
         boolean sks = isSKS(i1, i2, i3);
 
-        if (mauvaiseRedirection) categories.add("mauvaise_redirection");
-        if (redirection) categories.add("redirection");
-        if (sks) categories.add("SKS");
-
-        if (categories.isEmpty()) categories.add("autre_trigramme");
+        if (mauvaiseRedirection)
+            categories.add("mauvaise_redirection");
+        if (redirection)
+            categories.add("redirection");
+        if (sks)
+            categories.add("SKS");
+        if (categories.isEmpty())
+            categories.add("autre_trigramme");
         return categories;
     }
 
@@ -273,7 +340,8 @@ public class Evaluateur {
     }
 
     private boolean isCiseaux(TouchInfo i1, TouchInfo i2) {
-        if (!(isLeftHand(i1) == isLeftHand(i2))) return false;
+        if (!(isLeftHand(i1) == isLeftHand(i2)))
+            return false;
         int r1 = i1.getRangee();
         int r2 = i2.getRangee();
         return (r1 == 1 && r2 == 3) || (r1 == 3 && r2 == 1);
@@ -285,13 +353,16 @@ public class Evaluateur {
     }
 
     private boolean isRoulement(TouchInfo i1, TouchInfo i2) {
-        if (!(isLeftHand(i1) == isLeftHand(i2))) return false;
-        if (i1.getDoigt().equals(i2.getDoigt())) return false;
+        if (!(isLeftHand(i1) == isLeftHand(i2)))
+            return false;
+        if (i1.getDoigt().equals(i2.getDoigt()))
+            return false;
         return true; // Simplification
     }
 
     private boolean isRedirection(TouchInfo i1, TouchInfo i2, TouchInfo i3) {
-        if (!(isLeftHand(i1) == isLeftHand(i2) && isLeftHand(i2) == isLeftHand(i3))) return false;
+        if (!(isLeftHand(i1) == isLeftHand(i2) && isLeftHand(i2) == isLeftHand(i3)))
+            return false;
         int c1 = i1.getColonne();
         int c2 = i2.getColonne();
         int c3 = i3.getColonne();
@@ -307,7 +378,7 @@ public class Evaluateur {
     }
 
     public void afficherScores() {
-        System.out.println("\nRésultats de l'évaluation :");
+        System.out.println("\nResultats de l'evaluation :");
 
         // Tri en fonction du score
         scores.entrySet().stream()
