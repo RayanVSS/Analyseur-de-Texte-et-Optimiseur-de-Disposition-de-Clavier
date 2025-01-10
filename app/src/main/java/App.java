@@ -1,125 +1,67 @@
-import java.util.HashMap;
-import java.util.Scanner;
-import config.Analyseur;
-import config.Evaluateur;
-import utils.FileCounter;
-import utils.Readfile;
-import utils.Jsonfile;
+import services.*;
+import utils.ConsoleUtils;
 
+/**
+ * Classe principale de l'application.
+ */
 public class App {
-    public static Jsonfile<String, Integer> jsonfile = new Jsonfile<String, Integer>();
-    public static Analyseur analyseur;
-
-    public static void clear() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
-
-    public static int menu() {
-        Scanner scanner = new Scanner(System.in);
-        int choice = -1;
-        do {
-            System.out.println("\n############################");
-            System.out.println("1. Analyseur de frequence de suites de caracteres");
-            System.out.println("2. Un evaluateur de disposition de clavier");
-            System.out.println("3. Un optimiseur de disposition de clavier");
-            System.out.println("4. Texte disponible");
-            System.out.println("5. Quitter");
-            System.out.println("############################");
-            System.out.print("\nVotre choix : ");
-            if (scanner.hasNextInt()) {
-                choice = scanner.nextInt();
-                if (choice < 1 || choice > 5) {
-                    clear();
-                    System.out.println("Entree invalide ! un nombre entre 1 et 5.");
-                }
-            } else {
-                clear();
-                System.out.println("Entree invalide ! un entier est attendu.");
-                scanner.next(); // Consommer l'entrée invalide
-            }
-        } while (choice < 1 || choice > 5);
-        return choice;
-    }
-
-    public static int IntSelector() {
-        Scanner scanner = new Scanner(System.in);
-        int choice = -1;
-        do {
-            System.out.print("\nfrequence de combien de caractere: ");
-            if (scanner.hasNextInt()) {
-                choice = scanner.nextInt();
-                if (choice < 1) {
-                    clear();
-                    System.out.println("Entree invalide ! un nombre superieur a 0 est attendu.");
-                }
-                if (choice > 4) {
-                    clear();
-                    System.out.println("Entree invalide ! un nombre inferieur a 4 est attendu.");
-                }
-            } else {
-                clear();
-                System.out.println("Entree invalide ! un entier est attendu.");
-                scanner.next();
-            }
-        } while (choice < 1 || choice > 4);
-        return choice;
-    }
-
     public static void main(String[] args) {
-        clear();
+        ConsoleUtils.clear();
         int choix;
+        MenuHandler menuHandler = new MenuHandler();
+        FrequencyAnalyzer frequencyAnalyzer = new FrequencyAnalyzer();
+        KeyboardEvaluator keyboardEvaluator = new KeyboardEvaluator();
+        TextDisplay textDisplay = new TextDisplay();
+
         do {
-            choix = menu();
+            choix = menuHandler.displayMenuAndGetChoice();
             switch (choix) {
                 case 1:
-                    clear();
-                    // fichier et nombres d'occurence
-                    String file = FileCounter.FileSelector();
-                    if (file == null)
-                        break;
-                    int nb_occurence = IntSelector();
-
-                    // analyseur
-                    analyseur = new Analyseur(Readfile.readFile(file), nb_occurence);
-                    analyseur.analyse();
-                    analyseur.afficher(analyseur.getMap());
-
-                    // json
-                    jsonfile.create_json(analyseur.getMap(),
-                            FileCounter.getTerminalLocation() + "/resultat/analyseur.json");
+                    ConsoleUtils.clear();
+                    // Selectionner le nombre d'occurrences
+                    int nb_occurence = menuHandler.getIntInRange(1, 4, "Frequence de combien de caracteres : ");
+                    // Executer l'analyse de frequence
+                    frequencyAnalyzer.execute(nb_occurence);
                     break;
-                    case 2:
-                    clear();
-                    String resultFile = FileCounter.getTerminalLocation() + "/resultat/analyseur.json";
-                    // Charger les statistiques d'occurrences
-                    HashMap<String, Integer> stats = Jsonfile.readJsonAsMapStringInteger(resultFile);
 
-                    String dispositionPath = FileCounter.getTerminalLocation() + "/resultat/azerty.json";
-                    HashMap<Character, Evaluateur.TouchInfo> dispoMap = Jsonfile.loadDispositionFromJson(dispositionPath);
-
-                    // Créer l'évaluateur avec les stats et la disposition chargée
-                    Evaluateur evaluateur = new Evaluateur(stats, dispoMap);
-                    evaluateur.evaluer();
-                    evaluateur.afficherScores();
+                case 2:
+                    ConsoleUtils.clear();
+                    // Executer l'evaluation de la disposition du clavier
+                    keyboardEvaluator.execute();
                     break;
 
                 case 3:
-                    clear();
-                    System.out.println("🔒");
+                    ConsoleUtils.clear();
+                    System.out.println("🔒 Fonctionnalite à venir.");
                     break;
+
                 case 4:
-                    clear();
-                    FileCounter.FileCounterRun();
+                    ConsoleUtils.clear();
+                    // Executer l'affichage du nombre de caracteres
+                    textDisplay.execute();
                     break;
+
                 case 5:
-                    clear();
+                    ConsoleUtils.clear();
                     System.out.println("Quitter le programme.");
                     break;
+
                 default:
                     System.out.println("Choix invalide.");
             }
+            if (choix != 5) {
+                System.out.println("\nAppuyez sur Entree pour continuer...");
+                try {
+                    System.in.read();
+                } catch (Exception e) {
+                    // Ignorer
+                }
+            }
         } while (choix != 5);
-        clear();
+
+        // Fermer proprement tous les services
+        frequencyAnalyzer.shutdownExecutor();
+        keyboardEvaluator.shutdownExecutor();
+        ConsoleUtils.clear();
     }
 }
