@@ -13,7 +13,7 @@ public class Evaluateur {
      * classe interne pour stocker les informations sur les touches
      * rangee : la rangee de la touche
      * colonne : la colonne de la touche
-     * doigt : le doigt utilisé pour appuyer sur la touche
+     * doigt : le doigt utilise pour appuyer sur la touche
      * home : position de doigt au repos
      */
     public static class TouchInfo {
@@ -23,7 +23,7 @@ public class Evaluateur {
         private boolean home;
 
         // Ajout du champ shift en optionnel :
-        // Il peut être absent du JSON, dans ce cas on le considère false par défaut.
+        // Il peut être absent du JSON, dans ce cas on le considere false par defaut.
         private boolean shift;
 
         // Constructeur :
@@ -90,16 +90,16 @@ public class Evaluateur {
     }
 
     /**
-     * évalue les n-grammes et stocke les scores dans la map scores
+     * evalue les n-grammes et stocke les scores dans la map scores
      * NE FAIT PAS L'AFFICHAGE DES SCORES
      */
     public void evaluer() {
         for (Map.Entry<String, Integer> entry : nGramMap.entrySet()) {
             String nGram = entry.getKey();
             int freq = entry.getValue();
-            List<Character> expanded = expandNgram(nGram); 
+            List<Character> expanded = expandNgram(nGram);
 
-            // si la séquence dépasse 3 touches, on ignore
+            // si la sequence depasse 3 touches, on ignore
             if (expanded.size() == 0 || expanded.size() > 3) {
                 continue;
             }
@@ -126,9 +126,9 @@ public class Evaluateur {
         }
     }
 
-    // Nouvelle méthode pour transformer un n-gramme en liste de caractères
-    // tout en gérant la transformation des majuscules en minuscules (sans SHIFT)
-    // et l'option shift=true éventuellement définie dans le JSON.
+    // Nouvelle methode pour transformer un n-gramme en liste de caracteres
+    // tout en gerant la transformation des majuscules en minuscules (sans SHIFT)
+    // et l'option shift=true eventuellement definie dans le JSON.
     private List<Character> expandNgram(String ngram) {
         List<Character> result = new ArrayList<>();
         for (int i = 0; i < ngram.length(); i++) {
@@ -140,7 +140,7 @@ public class Evaluateur {
     }
 
     /**
-     * Convertit un caractère en sa (ou ses) touche(s) de base.
+     * Convertit un caractere en sa (ou ses) touche(s) de base.
      * Les modifications pour les majuscules :
      * - Si c est majuscule, on le convertit directement en minuscule
      * Pour shift=true dans le JSON on ajoute char SHIFT '¤',
@@ -157,12 +157,12 @@ public class Evaluateur {
             list.add(c);
             return list;
         }
-        // si shift est activé pour ce caractère => on ajoute SHIFT en plus
+        // si shift est active pour ce caractere => on ajoute SHIFT en plus
         // '¤' pour SHIFT
         if (info.isShift()) {
             list.add('¤');
         }
-        // on ajoute le caractère final
+        // on ajoute le caractere final
         list.add(c);
         return list;
     }
@@ -170,10 +170,10 @@ public class Evaluateur {
     /**
      * Analyse un monogramme
      * elle va :
-     * - analyser le doigt utilisé pour appuyer sur la touche
-     * - incrémenter les compteurs des mains
-     * - incrémenter les compteurs des doigts
-     * - retourner le doit utilisé ou "inconnu" si la touche n'est pas dans la
+     * - analyser le doigt utilise pour appuyer sur la touche
+     * - incrementer les compteurs des mains
+     * - incrementer les compteurs des doigts
+     * - retourner le doit utilise ou "inconnu" si la touche n'est pas dans la
      * disposition
      */
     private List<String> analyserMonogramme(String mono, int freq) {
@@ -202,8 +202,8 @@ public class Evaluateur {
     /**
      * Analyse un Bigramme
      * elle va :
-     * - incrémenter les compteurs des mains
-     * - incrémenter les compteurs des doigts
+     * - incrementer les compteurs des mains
+     * - incrementer les compteurs des doigts
      * - "inconue" si une des touches n'est pas dans la disposition
      * - si c'est un ciseaux
      * - si c'est un LSB
@@ -225,7 +225,7 @@ public class Evaluateur {
             return categories;
         }
 
-        // Incrémenter les compteurs des mains
+        // Incrementer les compteurs des mains
         if (isLeftHand(i1)) {
             countLeftHand += freq;
         } else {
@@ -238,7 +238,7 @@ public class Evaluateur {
             countRightHand += freq;
         }
 
-        // Incrémenter les compteurs des doigts
+        // Incrementer les compteurs des doigts
         fingerCount.put(i1.getDoigt(), fingerCount.getOrDefault(i1.getDoigt(), 0) + freq);
         fingerCount.put(i2.getDoigt(), fingerCount.getOrDefault(i2.getDoigt(), 0) + freq);
 
@@ -269,8 +269,8 @@ public class Evaluateur {
     /**
      * Analyse un Trigramme
      * elle va :
-     * - incrémenter les compteurs des mains
-     * - incrémenter les compteurs des doigts
+     * - incrementer les compteurs des mains
+     * - incrementer les compteurs des doigts
      * - "inconue" si une des touches n'est pas dans la disposition
      * - si c'est une mauvaise redirection
      * - si c'est une redirection
@@ -292,7 +292,7 @@ public class Evaluateur {
             return categories;
         }
 
-        // Incrémenter les compteurs des mains
+        // Incrementer les compteurs des mains
         if (isLeftHand(i1)) {
             countLeftHand += freq;
         } else {
@@ -311,7 +311,7 @@ public class Evaluateur {
             countRightHand += freq;
         }
 
-        // Incrémenter les compteurs des doigts
+        // Incrementer les compteurs des doigts
         fingerCount.put(i1.getDoigt(), fingerCount.getOrDefault(i1.getDoigt(), 0) + freq);
         fingerCount.put(i2.getDoigt(), fingerCount.getOrDefault(i2.getDoigt(), 0) + freq);
         fingerCount.put(i3.getDoigt(), fingerCount.getOrDefault(i3.getDoigt(), 0) + freq);
