@@ -1,10 +1,10 @@
 # Analyseur de Texte et Optimiseur de Disposition de Clavier
 
 # belhassen-bencheikh-projet-cpoo5-24-25
-##  Sommaire
 
 ## Sommaire
 
+- [Participant](#Participant)
 - [Notre Projet](#notre-projet)
 - [Fonctionnalités](#fonctionnalités)
 - [Installation](#installation)
@@ -14,6 +14,11 @@
 - [Configuration des Dispositions de Clavier](#configuration-des-dispositions-de-clavier)
 - [Options du Menu](#options-du-menu)
 
+
+
+## Participant
+ - Ilias BENCHEIKH
+ - Rayan BELHASSEN
 
 
 ## Notre Projet
