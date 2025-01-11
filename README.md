@@ -3,10 +3,10 @@
 # belhassen-bencheikh-projet-cpoo5-24-25
 ##  Sommaire
 
+Notre Projet
 Fonctionnalités
 Installation
-Configuration des Dispositions de Clavier
-Utilisation
+Intégration des Patron de conceptions
 Menu Principal
 Options du Menu
 Structure du Projet
@@ -115,9 +115,9 @@ Permet de notifier différentes parties de l'application lorsque des événement
 Simplifie la construction d'objets complexes comme les dispositions de clavier.
 Permet de gérer différentes sources de construction de manière uniforme.
 
-## Diagramme UML des patrons
+## Diagramme UML principale
 
-Pour une meilleure compréhension, voici un diagramme UML simplifié illustrant l'interaction entre les principales classes et patrons de conception.
+Pour une meilleure compréhension, voici un diagramme UML (NON EXHAUSTIF) simplifié illustrant l'interaction entre les `principales` classes et patrons de conception.
 
 ```lua
 +---------------------+          +---------------------+
@@ -248,9 +248,15 @@ rangée supérieure
       - `alternance`: main gauche/main droite
       - `roulement`: mouvement réalisé par deux doigts différents d’une même
 main
-      - `mauvaise redirection` 
-      - `redirection` 
-      - `SKS` (same key same finger)
-      - `autre_bigramme` 
-      - `autre_trigramme` 
-      - `tout les doitgs du clavier` (depend du pourcentage)
+      - `mauvaise redirection`: les mouvements à une main avec changement de direction
+      - `redirection particulier`: mauvaises redirections, ne faisant pas intervenir l’index
+      - `SKS` (same key same finger):  comme un SFB, mais avec une
+touche de l’autre main entre les deux
+      - `autre_bigramme`: mouvement correct 
+      - `autre_trigramme`: mouvement correct
+      - `tout les doitgs du clavier`: depend du pourcentage du doigt utiliser
+3. **Optimiseur de Disposition de Clavier**
+ILIASSSSS
+
+Le reste des options (de 4 a 7) sont assez explicites et ne demandent aucune manipulation particulière
+
