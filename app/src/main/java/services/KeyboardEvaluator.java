@@ -1,19 +1,25 @@
 package services;
 
+import builders.KeyboardLayoutBuilder;
+import builders.JsonKeyboardLayoutBuilder;
+import builders.KeyboardLayoutDirector;
+import services.observer.Observer;
+import services.observer.Subject;
 import config.Evaluateur;
+import models.KeyboardLayout;
 import utils.Jsonfile;
 import utils.FileCounter;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Classe pour gerer l'evaluation de la disposition du clavier.
  */
-public class KeyboardEvaluator extends AbstractService {
+public class KeyboardEvaluator extends AbstractService implements Subject {
 
     private Jsonfile<String, Integer> jsonfile;
     private FileCounter fileCounter;
+    private List<Observer> observers = new ArrayList<>();
 
     public KeyboardEvaluator() {
         super();
@@ -21,9 +27,23 @@ public class KeyboardEvaluator extends AbstractService {
         this.fileCounter = new FileCounter();
     }
 
-    /**
-     * Execute l'evaluation de la disposition du clavier.
-     */
+    @Override
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    @Override
+    public void unregisterObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    @Override
+    public void notifyObservers(String eventType, Object data) {
+        for (Observer observer : observers) {
+            observer.update(eventType, data);
+        }
+    }
+
     public void execute() {
         String resultFile = FileCounter.getTerminalLocation() + "/resultat/analyseur.json";
 
@@ -50,17 +70,25 @@ public class KeyboardEvaluator extends AbstractService {
             if (dispositionPath == null)
                 return;
 
-            // Charger la disposition du clavier selectionnee
-            HashMap<Character, Evaluateur.TouchInfo> dispoMap = Jsonfile.loadDispositionFromJson(dispositionPath);
-            if (dispoMap == null || dispoMap.isEmpty()) {
+            // Utiliser le Builder pour construire le KeyboardLayout
+            KeyboardLayoutDirector director = new KeyboardLayoutDirector();
+            KeyboardLayoutBuilder builder = new JsonKeyboardLayoutBuilder(dispositionPath);
+            director.setBuilder(builder);
+            KeyboardLayout keyboardLayout = director.constructKeyboardLayout();
+
+            if (keyboardLayout.getDisposition().isEmpty()) {
                 System.out.println("La disposition du clavier est vide ou le fichier n'existe pas.");
                 return;
             }
 
             // Creer l'evaluateur avec les stats agregees et la disposition chargee
-            Evaluateur evaluateur = new Evaluateur(aggregatedStats, dispoMap);
+            Evaluateur evaluateur = new Evaluateur(aggregatedStats, keyboardLayout.getDisposition());
             evaluateur.evaluer();
             evaluateur.afficherScores();
+
+            // Notifier les observateurs que l'evaluation est terminee
+            notifyObservers("KeyboardEvaluated", dispositionPath);
+
         } catch (Exception e) {
             System.out.println("Erreur lors du chargement ou de l'agregation des statistiques.");
             e.printStackTrace();

@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.checkerframework.checker.units.qual.s;
-
 public class Evaluateur {
 
     /*
@@ -23,7 +21,7 @@ public class Evaluateur {
         private boolean home;
 
         // Ajout du champ shift en optionnel :
-        // Il peut être absent du JSON, dans ce cas on le considere false par defaut.
+        // Il peut etre absent du JSON, dans ce cas on le considere false par defaut.
         private boolean shift;
 
         // Constructeur :
