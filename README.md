@@ -245,8 +245,9 @@ Avec comme critère d'evaluation:
       - `ciseaux`: mouvements à une main faisant succéder la rangée inférieure et la
 rangée supérieure
       - `LSB`  (left shift bigram) : mouvements à extension latérale
-      - `alternance` 
-      - `roulement`
+      - `alternance`: main gauche/main droite
+      - `roulement`: mouvement réalisé par deux doigts différents d’une même
+main
       - `mauvaise redirection` 
       - `redirection` 
       - `SKS` (same key same finger)
