@@ -155,29 +155,31 @@ public class Optimisateur {
     }
 
     public void afficherClavier(HashMap<Character, Evaluateur.TouchInfo> disposition) {
-        char[][] clavier = new char[3][10];
-        
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 10; j++) {
-                clavier[i][j] = ' ';
+        Character[][] clavier = new Character[4][13];
+        for (Map.Entry<Character, Evaluateur.TouchInfo> entry : disposition.entrySet()) {
+            Character c = entry.getKey();
+            Evaluateur.TouchInfo info = entry.getValue();
+            if (!info.isShift()) {
+                clavier[info.getRangee()][info.getColonne()] = c;
             }
         }
+        
+        System.out.println("\n|---------------------------------------------|");
+        
 
-        for (Map.Entry<Character, Evaluateur.TouchInfo> entry : disposition.entrySet()) {
-            char touche = entry.getKey();
-            Evaluateur.TouchInfo info = entry.getValue();
-            clavier[info.getRangee()-1][info.getColonne()-1] = touche;
-        }
-
-        System.out.println("\n|---------------------|");
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < 4; i++) {
             System.out.print("| ");
-            for (int j = 0; j < 10; j++) {
-                System.out.print(clavier[i][j] + " ");
+            for (int j = 0; j < 13; j++) {
+                if (clavier[i][j] != null) {
+                    System.out.print(clavier[i][j] + " ");
+                } else {
+                    System.out.print("  "); 
+                }
             }
             System.out.println("|");
         }
-        System.out.println("|---------------------|");
+        
+        System.out.println("|---------------------------------------------|");
     }
     
     private void sauvegarderDisposition(HashMap<Character, Evaluateur.TouchInfo> disposition) {
