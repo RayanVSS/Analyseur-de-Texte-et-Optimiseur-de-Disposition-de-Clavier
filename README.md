@@ -3,17 +3,17 @@
 # belhassen-bencheikh-projet-cpoo5-24-25
 ##  Sommaire
 
-Notre Projet
-Fonctionnalités
-Installation
-Intégration des Patron de conceptions
-Menu Principal
-Options du Menu
-Structure du Projet
-Exemples
-Dépannage
-Contribuer
-Licence
+## Sommaire
+
+- [Notre Projet](#notre-projet)
+- [Fonctionnalités](#fonctionnalités)
+- [Installation](#installation)
+- [Intégration des Patron de conceptions](#intégration-des-patron-de-conceptions)
+- [Diagramme UML principale](#diagramme-uml-principale)
+- [Structure du Projet](#structure-du-projet)
+- [Configuration des Dispositions de Clavier](#configuration-des-dispositions-de-clavier)
+- [Options du Menu](#options-du-menu)
+
 
 
 ## Notre Projet
@@ -260,3 +260,4 @@ ILIASSSSS
 
 Le reste des options (de 4 a 7) sont assez explicites et ne demandent aucune manipulation particulière
 
+![Diagramme UML](https://blogs.aphp.fr/wp-content/blogs.dir/214/files/2022/05/UniversiteParisCite_logo_horizontal_couleur_CMJN-200x76.jpg)
