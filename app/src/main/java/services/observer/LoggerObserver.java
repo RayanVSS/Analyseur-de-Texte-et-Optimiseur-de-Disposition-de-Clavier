@@ -1,7 +1,7 @@
 package services.observer;
 
 /**
- * Classe pour observer les evenements de l'application.
+ * Observateur pour enregistrer les evenements dans un journal de bord.
  */
 public class LoggerObserver implements Observer {
     @Override
@@ -14,7 +14,7 @@ public class LoggerObserver implements Observer {
                 System.out.println("[Logger] Analyse complete terminee. Resultats dans : " + data);
                 break;
             case "KeyboardEvaluated":
-                System.out.println("[Logger] l'analyse de frequence avec nbOccurence = " + data);
+                System.out.println("[Logger] l'analyse de frequence est terminee. clavier utiliser : " + data);
                 break;
             default:
                 System.out.println("[Logger] evenement inconnu : " + eventType);

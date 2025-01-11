@@ -11,7 +11,8 @@ public abstract class AbstractService {
     protected ExecutorService executor;
 
     public AbstractService() {
-        // Initialiser les threads avec le nombre de processeurs disponibles
+        // Initialiser le pool de threads avec un nombre de threads egal au nombre de
+        // processeurs disponibles
         this.executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
