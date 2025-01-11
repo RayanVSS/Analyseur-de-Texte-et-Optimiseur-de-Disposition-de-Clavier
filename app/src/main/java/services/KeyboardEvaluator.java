@@ -3,17 +3,18 @@ package services;
 import builders.KeyboardLayoutBuilder;
 import builders.JsonKeyboardLayoutBuilder;
 import builders.KeyboardLayoutDirector;
-import services.observer.Observer;
-import services.observer.Subject;
 import config.Evaluateur;
 import models.KeyboardLayout;
 import utils.Jsonfile;
 import utils.FileCounter;
+import services.observer.Observer;
+import services.observer.Subject;
 
 import java.util.*;
 
 /**
  * Classe pour gerer l'evaluation de la disposition du clavier.
+ * Implemente le patron Observateur/Observable.
  */
 public class KeyboardEvaluator extends AbstractService implements Subject {
 
@@ -21,6 +22,9 @@ public class KeyboardEvaluator extends AbstractService implements Subject {
     private FileCounter fileCounter;
     private List<Observer> observers = new ArrayList<>();
 
+    /**
+     * Constructeur qui initialise les utilitaires necessaires.
+     */
     public KeyboardEvaluator() {
         super();
         this.jsonfile = new Jsonfile<>();
@@ -44,6 +48,9 @@ public class KeyboardEvaluator extends AbstractService implements Subject {
         }
     }
 
+    /**
+     * Execute l'evaluation de la disposition du clavier.
+     */
     public void execute() {
         String resultFile = FileCounter.getTerminalLocation() + "/resultat/analyseur.json";
 

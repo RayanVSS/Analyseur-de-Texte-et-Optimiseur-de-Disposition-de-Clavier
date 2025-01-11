@@ -1,6 +1,8 @@
 import services.*;
-import utils.ConsoleUtils;
 import services.observer.LoggerObserver;
+import services.LoggingFrequencyAnalyzerDecorator;
+import services.IFrequencyAnalyzer;
+import utils.ConsoleUtils;
 
 /**
  * Classe principale de l'application.
@@ -10,12 +12,15 @@ public class App {
         ConsoleUtils.clear();
         int choix;
         MenuHandler menuHandler = new MenuHandler();
-        FrequencyAnalyzer frequencyAnalyzer = new FrequencyAnalyzer(new TextFileDataSource());
+        DataSource textDataSource = new TextFileDataSource();
+        FrequencyAnalyzer frequencyAnalyzer = new FrequencyAnalyzer(textDataSource);
         IFrequencyAnalyzer loggingAnalyzer = new LoggingFrequencyAnalyzerDecorator(frequencyAnalyzer);
         KeyboardEvaluator keyboardEvaluator = new KeyboardEvaluator();
         TextDisplay textDisplay = new TextDisplay();
+        KeyboardDisplay keyboardDisplay = new KeyboardDisplay();
+        ResultClearer resultClearer = new ResultClearer();
 
-        // Enregistrer les observateurs
+        // Enregistrer un observateur (par exemple, un logger)
         LoggerObserver logger = new LoggerObserver();
         frequencyAnalyzer.registerObserver(logger);
         keyboardEvaluator.registerObserver(logger);
@@ -50,13 +55,25 @@ public class App {
 
                 case 5:
                     ConsoleUtils.clear();
+                    // Executer l'affichage des claviers disponibles
+                    keyboardDisplay.execute();
+                    break;
+
+                case 6:
+                    ConsoleUtils.clear();
+                    // Executer la vidange des resultats de l'analyseur
+                    resultClearer.execute();
+                    break;
+
+                case 7:
+                    ConsoleUtils.clear();
                     System.out.println("Quitter le programme.");
                     break;
 
                 default:
                     System.out.println("Choix invalide.");
             }
-            if (choix != 5) {
+            if (choix != 7) {
                 System.out.println("\nAppuyez sur Entree pour continuer...");
                 try {
                     System.in.read();
@@ -64,7 +81,7 @@ public class App {
                     // Ignorer
                 }
             }
-        } while (choix != 5);
+        } while (choix != 7);
 
         // Fermer proprement tous les services
         frequencyAnalyzer.shutdownExecutor();

@@ -8,6 +8,11 @@ import java.util.Map;
 public class LoggingFrequencyAnalyzerDecorator implements IFrequencyAnalyzer {
     private IFrequencyAnalyzer wrappedAnalyzer;
 
+    /**
+     * Constructeur qui prend en parametre un analyseur de frequence à decorer.
+     *
+     * @param analyzer L'analyseur de frequence à decorer.
+     */
     public LoggingFrequencyAnalyzerDecorator(IFrequencyAnalyzer analyzer) {
         this.wrappedAnalyzer = analyzer;
     }

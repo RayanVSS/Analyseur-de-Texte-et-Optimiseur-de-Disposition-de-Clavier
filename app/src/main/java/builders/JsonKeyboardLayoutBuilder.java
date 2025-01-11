@@ -4,19 +4,21 @@ import config.Evaluateur;
 import models.KeyboardLayout;
 import utils.Jsonfile;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
- * JsonKeyboardLayoutBuilder est une classe qui permet de construire un objet
- * KeyboardLayout à partir d'un fichier JSON.
- * qui contient la disposition des touches du clavier.
+ * Monteur concret qui construit un KeyboardLayout à partir d'un fichier JSON.
  */
-
 public class JsonKeyboardLayoutBuilder implements KeyboardLayoutBuilder {
     private String jsonFilePath;
     private KeyboardLayout keyboardLayout;
 
+    /**
+     * Constructeur qui prend en parametre le chemin du fichier JSON.
+     *
+     * @param jsonFilePath Chemin du fichier JSON de disposition.
+     */
     public JsonKeyboardLayoutBuilder(String jsonFilePath) {
         this.jsonFilePath = jsonFilePath;
         this.keyboardLayout = new KeyboardLayout();

@@ -3,10 +3,10 @@ package utils;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
+/**
+ * Classe utilitaire pour la lecture de fichiers.
+ */
 public class Readfile {
 
     /**
@@ -18,7 +18,7 @@ public class Readfile {
      */
     public static String readFile(String filePath) {
         StringBuilder content = new StringBuilder();
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(filePath), StandardCharsets.UTF_8)) {
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = br.readLine()) != null) {
                 content.append(line).append("\n");
@@ -29,5 +29,4 @@ public class Readfile {
         }
         return content.toString();
     }
-
 }
