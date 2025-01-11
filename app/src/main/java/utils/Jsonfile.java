@@ -1,128 +1,118 @@
 package utils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+
+import config.Evaluateur.TouchInfo;
+
+import java.io.FileWriter;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
-import java.io.FileWriter;
-import java.io.IOException;
-import org.json.simple.JSONObject;
-import java.io.FileReader;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.stream.JsonReader;
 
-import config.Evaluateur;
+/**
+ * Classe utilitaire pour la gestion des fichiers JSON.
+ *
+ * @param <K> Type de la cle.
+ * @param <V> Type de la valeur.
+ */
+public class Jsonfile<K, V> {
 
-import java.lang.reflect.Type;
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-public class Jsonfile<T1, T2> {
-
-    public void create_json(HashMap<T1, T2> map, String path) {
-        JSONObject obj = new JSONObject();
-        for (T1 key : map.keySet()) {
-            obj.put(String.valueOf(key), String.valueOf(map.get(key)));
-        }
-        try (FileWriter file = new FileWriter(path)) {
-            file.write(obj.toJSONString());
-            file.flush();
+    /**
+     * Cree un fichier JSON à partir d'un objet.
+     *
+     * @param data     Donnees à ecrire.
+     * @param filePath Chemin du fichier JSON.
+     */
+    public void create_json(Object data, String filePath) {
+        try (FileWriter writer = new FileWriter(filePath)) {
+            gson.toJson(data, writer);
         } catch (IOException e) {
+            System.out.println("Erreur lors de la creation du fichier JSON : " + filePath);
             e.printStackTrace();
         }
     }
 
-    public HashMap<T1, T2> read_json(String path) {
-        JSONParser parser = new JSONParser();
-        HashMap<T1, T2> map = new HashMap<T1, T2>();
-        try {
-            Object obj = parser.parse(new FileReader(path));
-            JSONObject jsonObject = (JSONObject) obj;
-            for (Object key : jsonObject.keySet()) {
-                map.put((T1) key, (T2) jsonObject.get(key));
-            }
-        } catch (IOException | ParseException e) {
-            e.printStackTrace();
-        }
-        return map;
-    }
-
-    public static HashMap<Character, String> readJsonAsMap(String filePath) {
-        try (FileReader reader = new FileReader(filePath)) {
-            Type type = new TypeToken<HashMap<Character, String>>() {}.getType();
-            return new Gson().fromJson(reader, type);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-    
+    /**
+     * Lit un fichier JSON et le convertit en une Map de String à Integer.
+     *
+     * @param filePath Chemin du fichier JSON.
+     * @return Map contenant les donnees JSON ou null en cas d'erreur.
+     */
     public static HashMap<String, Integer> readJsonAsMapStringInteger(String filePath) {
         try (FileReader reader = new FileReader(filePath)) {
-            Type type = new TypeToken<HashMap<String, Integer>>() {}.getType();
-            return new Gson().fromJson(reader, type);
+            Type type = new TypeToken<HashMap<String, Integer>>() {
+            }.getType();
+            return gson.fromJson(reader, type);
         } catch (IOException e) {
-           System.out.println("Erreur lors de la lecture du fichier : " + filePath );
+            System.out.println("Erreur lors de la lecture du fichier JSON : " + filePath);
+            e.printStackTrace();
             return null;
         }
     }
 
- public static HashMap<Character, Evaluateur.TouchInfo> loadDispositionFromJson(String dispositionPath) {
-        HashMap<Character, Evaluateur.TouchInfo> dispositionMap = new HashMap<>();
-        
-        try (FileReader fr = new FileReader(dispositionPath);
-             JsonReader jr = new JsonReader(fr)) {
-            JsonObject root = JsonParser.parseReader(jr).getAsJsonObject();
-            JsonObject dispoObject = root.getAsJsonObject("disposition");
+    /**
+     * Lit un fichier JSON et le convertit en une Map de String à Map de String à
+     * Integer.
+     *
+     * @param filePath Chemin du fichier JSON.
+     * @return Map contenant les donnees JSON ou null en cas d'erreur.
+     */
+    public static Map<String, Map<String, Integer>> readJsonAsMapStringMapStringInteger(String filePath) {
+        try (FileReader reader = new FileReader(filePath)) {
+            Type type = new TypeToken<Map<String, Map<String, Integer>>>() {
+            }.getType();
+            return gson.fromJson(reader, type);
+        } catch (IOException e) {
+            System.out.println("Erreur lors de la lecture du fichier JSON : " + filePath);
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-            for (Map.Entry<String, JsonElement> entry : dispoObject.entrySet()) {
-                String key = entry.getKey();
-                JsonObject value = entry.getValue().getAsJsonObject();
+    /**
+     * Charge la disposition du clavier à partir d'un fichier JSON.
+     * Adapte pour la structure JSON avec la cle "disposition".
+     *
+     * @param filePath Chemin du fichier JSON de disposition.
+     * @return Map contenant les informations de disposition ou null en cas
+     *         d'erreur.
+     */
+    public static HashMap<Character, TouchInfo> loadDispositionFromJson(String filePath) {
+        try (FileReader reader = new FileReader(filePath)) {
+            // Definir le type pour le JSON avec la cle "disposition"
+            Type topLevelType = new TypeToken<Map<String, Map<String, TouchInfo>>>() {
+            }.getType();
+            Map<String, Map<String, TouchInfo>> topMap = gson.fromJson(reader, topLevelType);
 
-                int rangee = value.get("rangee").getAsInt();
-                int colonne = value.get("colonne").getAsInt();
-                String doigt = value.get("doigt").getAsString();
-                boolean home = value.get("home").getAsBoolean();
-                boolean shift = value.get("shift").getAsBoolean();
-
-
-                char c = key.charAt(0);
-                Evaluateur.TouchInfo info = new Evaluateur.TouchInfo(rangee, colonne, doigt, home, shift);
-                dispositionMap.put(c, info);
+            if (!topMap.containsKey("disposition")) {
+                System.out.println("La cle 'disposition' est absente du fichier JSON.");
+                return null;
             }
 
+            Map<String, TouchInfo> dispoMap = topMap.get("disposition");
+            HashMap<Character, TouchInfo> result = new HashMap<>();
+
+            for (Map.Entry<String, TouchInfo> entry : dispoMap.entrySet()) {
+                String key = entry.getKey();
+                if (key.length() != 1) {
+                    System.out.println("Cle de disposition invalide (doit etre un seul caractere) : " + key);
+                    continue;
+                }
+                char c = key.charAt(0);
+                result.put(c, entry.getValue());
+            }
+
+            return result;
         } catch (IOException e) {
+            System.out.println("Erreur lors de la lecture du fichier de disposition du clavier : " + filePath);
             e.printStackTrace();
-        }
-        
-        return dispositionMap;
-    }
-
-    public static void saveDispositionToJson(HashMap<Character, Evaluateur.TouchInfo> disposition, String dispositionPath) {
-        JsonObject dispoObject = new JsonObject();
-        for (Map.Entry<Character, Evaluateur.TouchInfo> entry : disposition.entrySet()) {
-            char key = entry.getKey();
-            Evaluateur.TouchInfo value = entry.getValue();
-
-            JsonObject infoObject = new JsonObject();
-            infoObject.addProperty("rangee", value.getRangee());
-            infoObject.addProperty("colonne", value.getColonne());
-            infoObject.addProperty("doigt", value.getDoigt());
-            infoObject.addProperty("home", value.isHome());
-
-            dispoObject.add(String.valueOf(key), infoObject);
-        }
-
-        JsonObject root = new JsonObject();
-        root.add("disposition", dispoObject);
-
-        try (FileWriter writer = new FileWriter(dispositionPath)) {
-            writer.write(root.toString());
-        } catch (IOException e) {
-            e.printStackTrace();
+            return null;
         }
     }
-
 }

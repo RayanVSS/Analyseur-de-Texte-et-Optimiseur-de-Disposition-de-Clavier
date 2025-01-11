@@ -1,0 +1,128 @@
+{
+    "disposition": {
+      "`": {"rangee": 0, "colonne": 0, "doigt": "auriculaire_gauche", "home": false, "shift": false},
+      "~": {"rangee": 0, "colonne": 0, "doigt": "auriculaire_gauche", "home": false, "shift": true},
+      
+      "1": {"rangee": 0, "colonne": 1, "doigt": "auriculaire_gauche", "home": false, "shift": false},
+      "!": {"rangee": 0, "colonne": 1, "doigt": "auriculaire_gauche", "home": false, "shift": true},
+      
+      "2": {"rangee": 0, "colonne": 2, "doigt": "annulaire_gauche", "home": false, "shift": false},
+      "@": {"rangee": 0, "colonne": 2, "doigt": "annulaire_gauche", "home": false, "shift": true},
+      
+      "3": {"rangee": 0, "colonne": 3, "doigt": "majeur_gauche", "home": false, "shift": false},
+      "#": {"rangee": 0, "colonne": 3, "doigt": "majeur_gauche", "home": false, "shift": true},
+      
+      "4": {"rangee": 0, "colonne": 4, "doigt": "index_gauche", "home": false, "shift": false},
+      "$": {"rangee": 0, "colonne": 4, "doigt": "index_gauche", "home": false, "shift": true},
+      
+      "5": {"rangee": 0, "colonne": 5, "doigt": "index_gauche", "home": false, "shift": false},
+      "%": {"rangee": 0, "colonne": 5, "doigt": "index_gauche", "home": false, "shift": true},
+      
+      "6": {"rangee": 0, "colonne": 6, "doigt": "index_droit", "home": false, "shift": false},
+      "^": {"rangee": 0, "colonne": 6, "doigt": "index_droit", "home": false, "shift": true},
+      
+      "7": {"rangee": 0, "colonne": 7, "doigt": "index_droit", "home": false, "shift": false},
+      "&": {"rangee": 0, "colonne": 7, "doigt": "index_droit", "home": false, "shift": true},
+      
+      "8": {"rangee": 0, "colonne": 8, "doigt": "majeur_droit", "home": false, "shift": false},
+      "*": {"rangee": 0, "colonne": 8, "doigt": "majeur_droit", "home": false, "shift": true},
+      
+      "9": {"rangee": 0, "colonne": 9, "doigt": "annulaire_droit", "home": false, "shift": false},
+      "(": {"rangee": 0, "colonne": 9, "doigt": "annulaire_droit", "home": false, "shift": true},
+      
+      "0": {"rangee": 0, "colonne": 10, "doigt": "auriculaire_droit", "home": false, "shift": false},
+      ")": {"rangee": 0, "colonne": 10, "doigt": "auriculaire_droit", "home": false, "shift": true},
+      
+      "-": {"rangee": 0, "colonne": 11, "doigt": "auriculaire_droit", "home": false, "shift": false},
+      "_": {"rangee": 0, "colonne": 11, "doigt": "auriculaire_droit", "home": false, "shift": true},
+      
+      "=": {"rangee": 0, "colonne": 12, "doigt": "auriculaire_droit", "home": false, "shift": false},
+      "+": {"rangee": 0, "colonne": 12, "doigt": "auriculaire_droit", "home": false, "shift": true},
+      
+      "q": {"rangee": 1, "colonne": 1, "doigt": "auriculaire_gauche", "home": true, "shift": false},
+      "Q": {"rangee": 1, "colonne": 1, "doigt": "auriculaire_gauche", "home": true, "shift": true},
+      
+      "w": {"rangee": 1, "colonne": 2, "doigt": "annulaire_gauche", "home": false, "shift": false},
+      "W": {"rangee": 1, "colonne": 2, "doigt": "annulaire_gauche", "home": false, "shift": true},
+      
+      "e": {"rangee": 1, "colonne": 3, "doigt": "majeur_gauche", "home": false, "shift": false},
+      "E": {"rangee": 1, "colonne": 3, "doigt": "majeur_gauche", "home": false, "shift": true},
+      
+      "r": {"rangee": 1, "colonne": 4, "doigt": "index_gauche", "home": false, "shift": false},
+      "R": {"rangee": 1, "colonne": 4, "doigt": "index_gauche", "home": false, "shift": true},
+      
+      "t": {"rangee": 1, "colonne": 5, "doigt": "index_gauche", "home": false, "shift": false},
+      "T": {"rangee": 1, "colonne": 5, "doigt": "index_gauche", "home": false, "shift": true},
+      
+      "y": {"rangee": 1, "colonne": 6, "doigt": "index_droit", "home": false, "shift": false},
+      "Y": {"rangee": 1, "colonne": 6, "doigt": "index_droit", "home": false, "shift": true},
+      
+      "u": {"rangee": 1, "colonne": 7, "doigt": "index_droit", "home": false, "shift": false},
+      "U": {"rangee": 1, "colonne": 7, "doigt": "index_droit", "home": false, "shift": true},
+      
+      "i": {"rangee": 1, "colonne": 8, "doigt": "majeur_droit", "home": false, "shift": false},
+      "I": {"rangee": 1, "colonne": 8, "doigt": "majeur_droit", "home": false, "shift": true},
+      
+      "o": {"rangee": 1, "colonne": 9, "doigt": "annulaire_droit", "home": false, "shift": false},
+      "O": {"rangee": 1, "colonne": 9, "doigt": "annulaire_droit", "home": false, "shift": true},
+      
+      "p": {"rangee": 1, "colonne": 10, "doigt": "auriculaire_droit", "home": false, "shift": false},
+      "P": {"rangee": 1, "colonne": 10, "doigt": "auriculaire_droit", "home": false, "shift": true},
+      
+      "{": {"rangee": 1, "colonne": 11, "doigt": "auriculaire_droit", "home": false, "shift": false},
+      "[": {"rangee": 1, "colonne": 11, "doigt": "auriculaire_droit", "home": false, "shift": true},
+      
+      "}": {"rangee": 1, "colonne": 12, "doigt": "auriculaire_droit", "home": false, "shift": false},
+      
+      "a": {"rangee": 2, "colonne": 1, "doigt": "auriculaire_gauche", "home": true, "shift": false},
+      
+      "s": {"rangee": 2, "colonne": 2, "doigt": "annulaire_gauche", "home": true, "shift": false},
+      
+      "d": {"rangee": 2, "colonne": 3, "doigt": "majeur_gauche", "home": true, "shift": false},
+      
+      "f": {"rangee": 2, "colonne": 4, "doigt": "index_gauche", "home": true, "shift": false},
+      
+      "g": {"rangee": 2, "colonne": 5, "doigt": "index_gauche", "home": false, "shift": false},
+      
+      "h": {"rangee": 2, "colonne": 6, "doigt": "index_droit", "home": false, "shift": false},
+      
+      "j": {"rangee": 2, "colonne": 7, "doigt": "index_droit", "home": true, "shift": false},
+      
+      "k": {"rangee": 2, "colonne": 8, "doigt": "majeur_droit", "home": true, "shift": false},
+      
+      "l": {"rangee": 2, "colonne": 9, "doigt": "annulaire_droit", "home": true, "shift": false},
+      
+      ";": {"rangee": 2, "colonne": 10, "doigt": "auriculaire_droit", "home": false, "shift": false},
+      ":": {"rangee": 2, "colonne": 10, "doigt": "auriculaire_droit", "home": false, "shift": true},
+      
+      "'": {"rangee": 2, "colonne": 11, "doigt": "auriculaire_droit", "home": false, "shift": false},
+      "\"": {"rangee": 2, "colonne": 11, "doigt": "auriculaire_droit", "home": false, "shift": true},
+      
+      "\\": {"rangee": 2, "colonne": 12, "doigt": "auriculaire_droit", "home": false, "shift": false},
+      "|": {"rangee": 2, "colonne": 12, "doigt": "auriculaire_droit", "home": false, "shift": true},
+      
+      "z": {"rangee": 3, "colonne": 1, "doigt": "auriculaire_gauche", "home": false, "shift": false},
+      
+      "x": {"rangee": 3, "colonne": 2, "doigt": "annulaire_gauche", "home": false, "shift": false},
+      
+      "c": {"rangee": 3, "colonne": 3, "doigt": "majeur_gauche", "home": false, "shift": false},
+      
+      "v": {"rangee": 3, "colonne": 4, "doigt": "index_gauche", "home": false, "shift": false},
+      
+      "b": {"rangee": 3, "colonne": 5, "doigt": "index_gauche", "home": false, "shift": false},
+      
+      "n": {"rangee": 3, "colonne": 6, "doigt": "index_droit", "home": false, "shift": false},
+      
+      "m": {"rangee": 3, "colonne": 7, "doigt": "majeur_droit", "home": false, "shift": false},
+      
+      ",": {"rangee": 3, "colonne": 8, "doigt": "annulaire_droit", "home": false, "shift": false},
+      "<": {"rangee": 3, "colonne": 8, "doigt": "annulaire_droit", "home": false, "shift": true},
+      
+      ".": {"rangee": 3, "colonne": 9, "doigt": "annulaire_droit", "home": false, "shift": false},
+      ">": {"rangee": 3, "colonne": 9, "doigt": "annulaire_droit", "home": false, "shift": true},
+      
+      "/": {"rangee": 3, "colonne": 10, "doigt": "auriculaire_droit", "home": false, "shift": false},
+      "?": {"rangee": 3, "colonne": 10, "doigt": "auriculaire_droit", "home": false, "shift": true}
+    }
+  }
+  

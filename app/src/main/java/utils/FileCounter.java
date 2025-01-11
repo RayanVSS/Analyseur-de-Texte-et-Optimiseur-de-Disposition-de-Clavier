@@ -1,83 +1,139 @@
 package utils;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Classe utilitaire pour la gestion des fichiers.
+ */
 public class FileCounter {
 
-    // lire tous les fichiers dans un dossier et afficher leur nombre de caractères
-    public void listFiles(String directoryPath) {
-        File folder = new File(directoryPath);
-
-        //chemin donne est un dossier
-        if (!folder.exists() || !folder.isDirectory()) {
-            System.out.println("Le chemin spécifié n'est pas un dossier valide.");
-            return;
-        }
-
-        // tous les fichiers dans le dossier
-        File[] files = folder.listFiles();
-        if (files == null || files.length == 0) {
-            System.out.println("Aucun fichier trouvé dans le dossier.");
-            return;
-        }
-
-        for (File file : files) {
-            if (file.isFile()) {
-                try {
-                    int characterCount = countCharacters(file);
-                    System.out.println("Fichier : " + file.getName() + " | Nombre de caracteres : " + characterCount);
-                } catch (IOException e) {
-                    System.out.println("Erreur lors de la lecture du fichier : " + file.getName());
-                }
-            }
-        }
-    }
-
-    //compter le nombre de caractères 
-    private int countCharacters(File file) throws IOException {
-        int characterCount = 0;
-
-        try (FileReader reader = new FileReader(file)) {
-            int c;
-            while ((c = reader.read()) != -1) {
-                characterCount++;
-            }
-        }
-
-        return characterCount;
-    }
-
+    /**
+     * Retourne le chemin du repertoire courant.
+     *
+     * @return Chemin du repertoire courant.
+     */
     public static String getTerminalLocation() {
         return System.getProperty("user.dir");
     }
 
+    /**
+     * Permet à l'utilisateur de selectionner des fichiers dans un repertoire donne.
+     *
+     * @param directoryPath Chemin du repertoire contenant les fichiers.
+     * @return Liste des chemins des fichiers selectionnes.
+     */
+    public List<String> selectFiles(String directoryPath) {
+        List<String> selectedFiles = new ArrayList<>();
+        File directory = new File(directoryPath);
+        if (!directory.exists() || !directory.isDirectory()) {
+            System.out.println("Le repertoire specifie n'existe pas ou n'est pas un repertoire.");
+            return selectedFiles;
+        }
 
-    public static String[] FileSelector() {
+        File[] files = directory.listFiles((dir, name) -> name.endsWith(".txt"));
+        if (files == null || files.length == 0) {
+            System.out.println("Aucun fichier texte disponible dans le repertoire.");
+            return selectedFiles;
+        }
+
+        System.out.println("Fichiers disponibles dans " + directoryPath + ":");
+        for (int i = 0; i < files.length; i++) {
+            System.out.println((i + 1) + ". " + files[i].getName());
+        }
+
+        System.out
+                .print("\nEntrez les numeros des fichiers souhaites separes par des virgules (par exemple: 1,3,5) : ");
         Scanner scanner = new Scanner(System.in);
-        FileCounter.FileCounterRun();
-        System.out.println("Entrez le chemin du fichier : ");
-        String filePath = scanner.nextLine();
-        String[] tab=filePath.split(" ");
-        for (int i=0; i<tab.length; i++){
-            File file = new File(getTerminalLocation() + "/texte/" + tab[i]);
-            if (!file.exists()) {
-                System.out.println("Le fichier "+tab[i]+" n'existe pas.");
-                tab[i]=null;
-            }else{
-                tab[i]=getTerminalLocation()+ "/texte/" +tab[i];
+        String input = scanner.nextLine();
+        String[] parts = input.split(",");
+
+        for (String part : parts) {
+            try {
+                int index = Integer.parseInt(part.trim()) - 1;
+                if (index >= 0 && index < files.length) {
+                    selectedFiles.add(files[index].getAbsolutePath());
+                } else {
+                    System.out.println("Numero de fichier invalide : " + (index + 1));
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Entree invalide : " + part);
             }
         }
-        return tab;
+
+        return selectedFiles;
     }
 
-    // Méthode principale pour tester la classe
-    public static void FileCounterRun() {
-        FileCounter counter = new FileCounter();
-        String directoryPath = getTerminalLocation()+ "/texte"; 
-        counter.listFiles(directoryPath);
+    /**
+     * Permet à l'utilisateur de selectionner une disposition de clavier dans le
+     * repertoire /clavier.
+     *
+     * @return Chemin du fichier de disposition selectionne ou null si aucun
+     *         selectionne.
+     */
+    public String selectKeyboardLayout() {
+        String clavierDir = getTerminalLocation() + "/clavier";
+        File directory = new File(clavierDir);
+        if (!directory.exists() || !directory.isDirectory()) {
+            System.out.println("Le repertoire des claviers n'existe pas ou n'est pas un repertoire.");
+            return null;
+        }
+
+        File[] files = directory.listFiles((dir, name) -> name.endsWith(".json"));
+        if (files == null || files.length == 0) {
+            System.out.println("Aucune disposition de clavier disponible.");
+            return null;
+        }
+
+        System.out.println("Dispositions de clavier disponibles dans " + clavierDir + " :");
+        for (int i = 0; i < files.length; i++) {
+            System.out.println((i + 1) + ". " + files[i].getName());
+        }
+
+        System.out.print("\nEntrez le numero de la disposition de clavier souhaitee (ou 0 pour annuler) : ");
+        Scanner scanner = new Scanner(System.in);
+        String input = scanner.nextLine();
+        int choice;
+        try {
+            choice = Integer.parseInt(input.trim());
+            if (choice == 0) {
+                return null;
+            }
+            if (choice < 1 || choice > files.length) {
+                System.out.println("Numero de disposition invalide.");
+                return null;
+            }
+            return files[choice - 1].getAbsolutePath();
+        } catch (NumberFormatException e) {
+            System.out.println("Entree invalide.");
+            return null;
+        }
     }
 
+    /**
+     * Execute un compteur de caracteres dans tous les fichiers texte du repertoire
+     * /texte.
+     */
+    public void runFileCounter() {
+        String texteDir = getTerminalLocation() + "/texte";
+        List<String> selectedFiles = selectFiles(texteDir);
+        if (selectedFiles.isEmpty()) {
+            System.out.println("Aucun fichier selectionne.");
+            return;
+        }
+
+        for (String filePath : selectedFiles) {
+            try {
+                String content = Readfile.readFile(filePath);
+                int charCount = content.length();
+                System.out.println(
+                        "Fichier : " + new File(filePath).getName() + " - Nombre de caracteres : " + charCount);
+            } catch (Exception e) {
+                System.out.println("Erreur lors du comptage des caracteres du fichier : " + filePath);
+                e.printStackTrace();
+            }
+        }
+    }
 }

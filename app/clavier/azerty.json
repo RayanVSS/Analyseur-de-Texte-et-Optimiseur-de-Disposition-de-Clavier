@@ -1,8 +1,8 @@
 {
   "disposition": {
     
-    "¤": {"rangee": 3, "colonne": 0, "doigt": "auriculaire_gauche", "home": false, "shift": false},
-
+    "↑": {"rangee": 3, "colonne": 0,  "doigt": "auriculaire_gauche", "home": false, "shift": false},
+   
     "²": {"rangee": 0, "colonne": 0, "doigt": "auriculaire_gauche", "home": false, "shift": false},
     "&": {"rangee": 0, "colonne": 1, "doigt": "auriculaire_gauche", "home": false, "shift": false},
     "1": {"rangee": 0, "colonne": 1, "doigt": "auriculaire_gauche", "home": false, "shift": true},
@@ -12,7 +12,6 @@
     "3": {"rangee": 0, "colonne": 3, "doigt": "majeur_gauche",  "home": false, "shift": true},
     "'": {"rangee": 0, "colonne": 4, "doigt": "index_gauche",  "home": false, "shift": false},
     "4": {"rangee": 0, "colonne": 4, "doigt": "index_gauche",  "home": false, "shift": true},
-    "{": {"rangee": 0, "colonne": 4, "doigt": "index_gauche",  "home": false, "shift": false},
     "(": {"rangee": 0, "colonne": 5, "doigt": "index_gauche",  "home": false, "shift": false},
     "5": {"rangee": 0, "colonne": 5, "doigt": "index_gauche",  "home": false, "shift": true},
     "-": {"rangee": 0, "colonne": 6, "doigt": "index_droit",  "home": false, "shift": false},
@@ -29,11 +28,7 @@
     "°": {"rangee": 0, "colonne": 11, "doigt": "auriculaire_droit",  "home": false, "shift": true},
     "=": {"rangee": 0, "colonne": 12, "doigt": "auriculaire_droit",  "home": false, "shift": false},
     "+": {"rangee": 0, "colonne": 12, "doigt": "auriculaire_droit",  "home": false, "shift": true},
-    "}": {"rangee": 0, "colonne": 12, "doigt": "auriculaire_droit",  "home": false, "shift": false},
     
-
-
-
     "a": {"rangee": 1, "colonne": 1, "doigt": "auriculaire_gauche", "home": false, "shift": false},
     "z": {"rangee": 1, "colonne": 2, "doigt": "annulaire_gauche",  "home": false, "shift": false},
     "e": {"rangee": 1, "colonne": 3, "doigt": "majeur_gauche",  "home": false, "shift": false},
@@ -59,26 +54,26 @@
     "k": {"rangee": 2, "colonne": 8, "doigt": "majeur_droit",  "home": true, "shift": false},
     "l": {"rangee": 2, "colonne": 9, "doigt": "annulaire_droit",  "home": true, "shift": false},
     "m": {"rangee": 2, "colonne": 10, "doigt": "auriculaire_droit",  "home": true, "shift": false},
-    "ù": {"rangee": 2, "colonne": 10, "doigt": "auriculaire_droit",  "home": true, "shift": false},
-    "%": {"rangee": 2, "colonne": 10, "doigt": "auriculaire_droit",  "home": true, "shift": true},
-    "*": {"rangee": 2, "colonne": 10, "doigt": "auriculaire_droit",  "home": true, "shift": false},
-    "µ": {"rangee": 2, "colonne": 10, "doigt": "auriculaire_droit",  "home": true, "shift": true},
+    "ù": {"rangee": 2, "colonne": 11, "doigt": "auriculaire_droit",  "home": true, "shift": false},
+    "%": {"rangee": 2, "colonne": 11, "doigt": "auriculaire_droit",  "home": true, "shift": true},
+    "*": {"rangee": 2, "colonne": 12, "doigt": "auriculaire_droit",  "home": true, "shift": false},
+    "µ": {"rangee": 2, "colonne": 12, "doigt": "auriculaire_droit",  "home": true, "shift": true},
 
-    "w": {"rangee": 3, "colonne": 1, "doigt": "auriculaire_gauche",  "home": false, "shift": false},
-    "x": {"rangee": 3, "colonne": 2, "doigt": "annulaire_gauche",  "home": false, "shift": false},
-    "c": {"rangee": 3, "colonne": 3, "doigt": "majeur_gauche",  "home": false, "shift": false},
-    "v": {"rangee": 3, "colonne": 4, "doigt": "index_gauche",  "home": false, "shift": false},
-    "b": {"rangee": 3, "colonne": 5, "doigt": "index_gauche",  "home": false, "shift": false},
-    "n": {"rangee": 3, "colonne": 6, "doigt": "index_droit",  "home": false, "shift": false},
-    ",": {"rangee": 3, "colonne": 7, "doigt": "index_droit",  "home": false, "shift": false},
-    "?": {"rangee": 3, "colonne": 7, "doigt": "index_droit",  "home": false, "shift": true},
-    ";": {"rangee": 3, "colonne": 8, "doigt": "majeur_droit",  "home": false, "shift": false},
-    ".": {"rangee": 3, "colonne": 8, "doigt": "majeur_droit",  "home": false, "shift": true},
-    ":": {"rangee": 3, "colonne": 9, "doigt": "annulaire_droit",  "home": false, "shift": false},
-    "/": {"rangee": 3, "colonne": 9, "doigt": "annulaire_droit",  "home": false, "shift": true},
-    "!": {"rangee": 3, "colonne": 10, "doigt": "auriculaire_droit", "home": false, "shift": false},
-    "§": {"rangee": 3, "colonne": 10, "doigt": "auriculaire_droit", "home": false, "shift": true},
-    "<": {"rangee": 3, "colonne": 0, "doigt": "auriculaire_droit", "home": false, "shift": false},
-    ">": {"rangee": 3, "colonne": 0, "doigt": "auriculaire_droit", "home": false, "shift": true}
+    "w": {"rangee": 3, "colonne": 2, "doigt": "auriculaire_gauche",  "home": false, "shift": false},
+    "x": {"rangee": 3, "colonne": 3, "doigt": "annulaire_gauche",  "home": false, "shift": false},
+    "c": {"rangee": 3, "colonne": 4, "doigt": "majeur_gauche",  "home": false, "shift": false},
+    "v": {"rangee": 3, "colonne": 5, "doigt": "index_gauche",  "home": false, "shift": false},
+    "b": {"rangee": 3, "colonne": 6, "doigt": "index_gauche",  "home": false, "shift": false},
+    "n": {"rangee": 3, "colonne": 7, "doigt": "index_droit",  "home": false, "shift": false},
+    ",": {"rangee": 3, "colonne": 8, "doigt": "index_droit",  "home": false, "shift": false},
+    "?": {"rangee": 3, "colonne": 8, "doigt": "index_droit",  "home": false, "shift": true},
+    ";": {"rangee": 3, "colonne": 9, "doigt": "majeur_droit",  "home": false, "shift": false},
+    ".": {"rangee": 3, "colonne": 9, "doigt": "majeur_droit",  "home": false, "shift": true},
+    ":": {"rangee": 3, "colonne": 10, "doigt": "annulaire_droit",  "home": false, "shift": false},
+    "/": {"rangee": 3, "colonne": 10, "doigt": "annulaire_droit",  "home": false, "shift": true},
+    "!": {"rangee": 3, "colonne": 11, "doigt": "auriculaire_droit", "home": false, "shift": false},
+    "§": {"rangee": 3, "colonne": 11, "doigt": "auriculaire_droit", "home": false, "shift": true},
+    "<": {"rangee": 3, "colonne": 1, "doigt": "auriculaire_droit", "home": false, "shift": false},
+    ">": {"rangee": 3, "colonne": 1, "doigt": "auriculaire_droit", "home": false, "shift": true}
   }
 }
