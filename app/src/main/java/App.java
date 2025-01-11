@@ -1,5 +1,6 @@
 import services.*;
 import utils.ConsoleUtils;
+import services.observer.LoggerObserver;
 
 /**
  * Classe principale de l'application.
@@ -9,9 +10,15 @@ public class App {
         ConsoleUtils.clear();
         int choix;
         MenuHandler menuHandler = new MenuHandler();
-        FrequencyAnalyzer frequencyAnalyzer = new FrequencyAnalyzer();
+        FrequencyAnalyzer frequencyAnalyzer = new FrequencyAnalyzer(new TextFileDataSource());
+        IFrequencyAnalyzer loggingAnalyzer = new LoggingFrequencyAnalyzerDecorator(frequencyAnalyzer);
         KeyboardEvaluator keyboardEvaluator = new KeyboardEvaluator();
         TextDisplay textDisplay = new TextDisplay();
+
+        // Enregistrer les observateurs
+        LoggerObserver logger = new LoggerObserver();
+        frequencyAnalyzer.registerObserver(logger);
+        keyboardEvaluator.registerObserver(logger);
 
         do {
             choix = menuHandler.displayMenuAndGetChoice();
@@ -21,7 +28,7 @@ public class App {
                     // Selectionner le nombre d'occurrences
                     int nb_occurence = menuHandler.getIntInRange(1, 4, "Frequence de combien de caracteres : ");
                     // Executer l'analyse de frequence
-                    frequencyAnalyzer.execute(nb_occurence);
+                    loggingAnalyzer.execute(nb_occurence);
                     break;
 
                 case 2:

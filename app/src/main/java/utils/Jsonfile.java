@@ -101,7 +101,7 @@ public class Jsonfile<K, V> {
             for (Map.Entry<String, TouchInfo> entry : dispoMap.entrySet()) {
                 String key = entry.getKey();
                 if (key.length() != 1) {
-                    System.out.println("Cle de disposition invalide (doit être un seul caractere) : " + key);
+                    System.out.println("Cle de disposition invalide (doit etre un seul caractere) : " + key);
                     continue;
                 }
                 char c = key.charAt(0);

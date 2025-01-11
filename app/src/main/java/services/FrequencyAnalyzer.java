@@ -1,9 +1,9 @@
 package services;
 
-import config.Analyseur;
-import utils.FileCounter;
-import utils.Jsonfile;
-import utils.Readfile;
+import config.*;
+import utils.*;
+import services.observer.Observer;
+import services.observer.Subject;
 
 import java.io.File;
 import java.util.*;
@@ -12,32 +12,56 @@ import java.util.concurrent.*;
 /**
  * Classe pour gerer l'analyse de frequence des suites de caracteres.
  */
-public class FrequencyAnalyzer extends AbstractService {
+public class FrequencyAnalyzer extends AbstractService implements IFrequencyAnalyzer, Subject {
 
-    private FileCounter fileCounter;
-    private Jsonfile<String, Object> jsonfile; // Utilisation de Object pour permettre Map<String, Map<String, Integer>>
+    private DataSource dataSource;
+    private Jsonfile<String, Object> jsonfile;
+    private ConcurrentMap<String, Map<String, Integer>> allResults = new ConcurrentHashMap<>();
+    private List<Observer> observers = new ArrayList<>();
 
-    public FrequencyAnalyzer() {
+    public FrequencyAnalyzer(DataSource dataSource) {
         super();
-        this.fileCounter = new FileCounter();
+        this.dataSource = dataSource;
         this.jsonfile = new Jsonfile<>();
     }
 
     /**
-     * Execute l'analyse de frequence.
-     *
-     * @param nb_occurence Frequence de combien de caracteres (nb_occurence).
+     * Enregistre un observateur pour les evenements de l'application.
      */
-    public void execute(int nb_occurence) {
+    @Override
+    public void registerObserver(Observer observer) {
+        observers.add(observer);
+    }
+
+    /**
+     * Supprime un observateur pour les evenements de l'application.
+     */
+    @Override
+    public void unregisterObserver(Observer observer) {
+        observers.remove(observer);
+    }
+
+    /**
+     * Notifie tous les observateurs d'un evenement.
+     */
+    @Override
+    public void notifyObservers(String eventType, Object data) {
+        for (Observer observer : observers) {
+            observer.update(eventType, data);
+        }
+    }
+
+    /**
+     * Execute l'analyse de frequence des suites de caracteres.
+     */
+    @Override
+    public void execute(int nbOccurence) {
         String texteDir = FileCounter.getTerminalLocation() + "/texte";
-        List<String> selectedFiles = fileCounter.selectFiles(texteDir);
+        List<String> selectedFiles = dataSource.getFilePaths(texteDir);
         if (selectedFiles.isEmpty()) {
             System.out.println("Aucun fichier selectionne.");
             return;
         }
-
-        // Preparer une structure pour collecter les resultats de maniere thread-safe
-        ConcurrentMap<String, Map<String, Integer>> allResults = new ConcurrentHashMap<>();
 
         // Liste des tâches
         List<Callable<Void>> tasks = new ArrayList<>();
@@ -49,7 +73,7 @@ public class FrequencyAnalyzer extends AbstractService {
                     String content = Readfile.readFile(filePath);
 
                     // Analyser la frequence des caracteres
-                    Analyseur localAnalyseur = new Analyseur(content, nb_occurence);
+                    Analyseur localAnalyseur = new Analyseur(content, nbOccurence);
                     localAnalyseur.analyse();
                     Map<String, Integer> frequencyMap = localAnalyseur.getMap();
 
@@ -58,6 +82,10 @@ public class FrequencyAnalyzer extends AbstractService {
                     allResults.put(fileName, frequencyMap);
 
                     System.out.println("Analyse terminee pour le fichier : " + fileName);
+
+                    // Notifier les observateurs pour chaque fichier analyse
+                    notifyObservers("FileAnalyzed", fileName);
+
                 } catch (Exception e) {
                     System.out.println("Erreur lors de l'analyse du fichier : " + filePath);
                     e.printStackTrace();
@@ -88,11 +116,27 @@ public class FrequencyAnalyzer extends AbstractService {
             // Generer un fichier JSON contenant tous les resultats
             String jsonOutputPath = FileCounter.getTerminalLocation() + "/resultat/analyseur.json";
             jsonfile.create_json(allResults, jsonOutputPath);
-            System.out.println("\nResultats enregistres dans : " + jsonOutputPath);
+
+            // Notifier les observateurs que l'analyse complete est terminee
+            notifyObservers("AnalysisCompleted", jsonOutputPath);
 
         } catch (InterruptedException | ExecutionException e) {
             System.out.println("Erreur lors de l'execution des tâches d'analyse.");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Retourne les resultats de l'analyse de frequence.
+     */
+    @Override
+    public Map<String, Integer> getResults() {
+        Map<String, Integer> aggregatedResults = new HashMap<>();
+        for (Map<String, Integer> freqMap : allResults.values()) {
+            for (Map.Entry<String, Integer> entry : freqMap.entrySet()) {
+                aggregatedResults.merge(entry.getKey(), entry.getValue(), Integer::sum);
+            }
+        }
+        return aggregatedResults;
     }
 }
