@@ -136,17 +136,17 @@ Pour une meilleure compréhension, voici un diagramme UML (NON EXHAUSTIF) simpli
         |
         | Uses
         |
-+----------------------+          +---------------------+
-| FrequencyAnalyzer    |          | KeyboardEvaluator   |
-+----------------------+          +---------------------+
-| - dataSource         |          | - jsonfile          |
-| - observers          |          | - fileCounter       |
-| - allResults         |          |                     |
-+----------------------+          +---------------------+
-| + execute()          |          | + execute()         |
-| + registerObserver() |          | + registerObserver()|
-| + notifyObservers()  |          | + notifyObservers() |
-+----------------------+          +---------------------+
++----------------------+          +---------------------+          +---------------------+
+| FrequencyAnalyzer    |          | KeyboardEvaluator   |          | KeyboardOptimisateur|
++----------------------+          +---------------------+          +---------------------+
+| - dataSource         |          | - jsonfile          |          |                     |
+| - observers          |          | - fileCounter       |          |                     |
+| - allResults         |          |                     |          |                     |
++----------------------+          +---------------------+          +---------------------+
+| + execute()          |          | + execute()         |          | + execute()         |
+| + registerObserver() |          | + registerObserver()|          | + registerObserver()|
+| + notifyObservers()  |          | + notifyObservers() |          | + notifyObservers() |
++----------------------+          +---------------------+          +---------------------+
         |
         | Decorated by
         |
@@ -184,33 +184,39 @@ Pour une meilleure compréhension, voici un diagramme UML (NON EXHAUSTIF) simpli
 │
 ├── /resultat
 │   ├── analyseur.json
-│   └── ... autres résultats ...
+│   └── optimise.json
 │
-├── /config
-│   ├── Analyseur.java
-│   └── Evaluateur.java
-│
-├── /utils
-│   ├── ConsoleUtils.java
-│   ├── FileCounter.java
-│   ├── Jsonfile.java
-│   └── Readfile.java
-│
-├── /services
-│   ├── AbstractService.java
-│   ├── FrequencyAnalyzer.java
-│   ├── KeyboardEvaluator.java
-│   ├── KeyboardDisplay.java
-│   ├── ResultClearer.java
-│   ├── TextDisplay.java
-│   ├── MenuHandler.java
-│   ├── IFrequencyAnalyzer.java
-│   ├── LoggingFrequencyAnalyzerDecorator.java
-│   ├── observer
-│   │   ├── Observer.java
-│   │   ├── Subject.java
-│   │   └── LoggerObserver.java
-│
+├──/src/main/java   
+│   ├── /config
+│   │   ├── Analyseur.java
+│   │   ├── Evaluateur.java
+│   │   └── Optimisateur.java
+│   │
+│   ├── /models
+│   │   └── KeyboardLayout.java
+│   │
+│   ├── /utils
+│   │   ├── ConsoleUtils.java
+│   │   ├── FileCounter.java
+│   │   ├── Jsonfile.java
+│   │   └── Readfile.java
+│   │
+│   ├── /services
+│   │   ├── AbstractService.java
+│   │   ├── FrequencyAnalyzer.java
+│   │   ├── KeyboardEvaluator.java
+│   │   ├── KeyboardDisplay.java
+│   │   ├── KeyboardEvaluator.java
+│   │   ├── ResultClearer.java
+│   │   ├── TextDisplay.java
+│   │   ├── MenuHandler.java
+│   │   ├── IFrequencyAnalyzer.java
+│   │   ├── LoggingFrequencyAnalyzerDecorator.java
+│   │   ├── observer
+│   │   │   ├── Observer.java
+│   │   │   ├── Subject.java
+│   │   │   └── LoggerObserver.java
+│   │
 └── App.java
 ```
 
