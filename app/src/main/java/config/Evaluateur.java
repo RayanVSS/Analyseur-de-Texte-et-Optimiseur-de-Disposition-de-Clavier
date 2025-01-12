@@ -79,10 +79,10 @@ public class Evaluateur {
      * - SFB (+) (same finger bigram)
      * - ciseaux (+)
      * - LSB (+) (left shift bigram)
-     * - alternance (+)
-     * - roulement(+)
+     * - alternance (-)
+     * - roulement(-)
      * - mauvaise redirection (+)
-     * - redirection (+)
+     * - redirection particulier (+)
      * - SKS (+) (same key same finger)
      * - autre_bigramme (-)
      * - autre_trigramme (-)
@@ -341,7 +341,7 @@ public class Evaluateur {
         if (mauvaiseRedirection)
             categories.add("mauvaise_redirection");
         if (redirection)
-            categories.add("redirection");
+            categories.add("redirection_particulier");
         if (sks)
             categories.add("SKS");
         if (categories.isEmpty())
