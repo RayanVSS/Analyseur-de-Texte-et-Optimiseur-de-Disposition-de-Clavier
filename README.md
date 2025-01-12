@@ -47,7 +47,9 @@ voir le fichier `Diagramme_des_classes.pdf`
   - Affichage des scores d'efficacité pour chaque disposition évaluée.
 
 - Optimiseur de Disposition de Clavier :
-  - ILIASSSSS
+  - générer un clavier optimisé en fonction du corpus donné.
+  - affichage graphique d'un clavier.
+  - écriture du clavier en format JSON.
 
 - Affichage des Dispositions de Clavier Disponibles :
   - Liste des dispositions de clavier disponibles dans le répertoire dédié.
@@ -271,7 +273,7 @@ touche de l’autre main entre les deux
       - `autre_trigramme`: mouvement correct
       - `tout les doitgs du clavier`: depend du pourcentage du doigt utiliser
 3. **Optimiseur de Disposition de Clavier**
-ILIASSSSS
+
 
 Le reste des options (de 4 a 7) sont assez explicites et ne demandent aucune manipulation particulière
 
