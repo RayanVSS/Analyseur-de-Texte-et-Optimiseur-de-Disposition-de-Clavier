@@ -4,16 +4,29 @@
 
 ## Sommaire
 
-- [Participant](#participant)
-- [Notre Projet](#notre-projet)
-- [Diagramme des classes](#diagramme-des-classes)
-- [Fonctionnalités](#fonctionnalités)
-- [Installation](#installation)
-- [Intégration des Patron de conceptions](#intégration-des-patron-de-conceptions)
-- [Diagramme UML principale](#diagramme-uml-principale)
-- [Structure du Projet](#structure-du-projet)
-- [Configuration des Dispositions de Clavier](#configuration-des-dispositions-de-clavier)
-- [Options du Menu](#options-du-menu)
+- [Analyseur de Texte et Optimiseur de Disposition de Clavier](#analyseur-de-texte-et-optimiseur-de-disposition-de-clavier)
+- [belhassen-bencheikh-projet-cpoo5-24-25](#belhassen-bencheikh-projet-cpoo5-24-25)
+  - [Sommaire](#sommaire)
+  - [Participant](#participant)
+  - [Notre Projet](#notre-projet)
+  - [Diagramme des classes](#diagramme-des-classes)
+  - [Fonctionnalités](#fonctionnalités)
+  - [Installation](#installation)
+      - [Prérequis](#prérequis)
+      - [Étapes d'Installation](#étapes-dinstallation)
+  - [Intégration des Patron de conceptions](#intégration-des-patron-de-conceptions)
+        - [Rappel](#rappel)
+        - [Patron de conceptions](#patron-de-conceptions)
+      - [Décorateur (LoggingFrequencyAnalyzerDecorator) :](#décorateur-loggingfrequencyanalyzerdecorator-)
+      - [Délégation (DataSource et TextFileDataSource) :](#délégation-datasource-et-textfiledatasource-)
+      - [Observateur/Observable (Observer et Subject) :](#observateurobservable-observer-et-subject-)
+      - [Monteur (Builder) (KeyboardLayoutBuilder, JsonKeyboardLayoutBuilder, KeyboardLayoutDirector) :](#monteur-builder-keyboardlayoutbuilder-jsonkeyboardlayoutbuilder-keyboardlayoutdirector-)
+  - [Diagramme UML principale](#diagramme-uml-principale)
+        - [Explications :](#explications-)
+  - [Structure du Projet](#structure-du-projet)
+      - [Description des Dossiers Principaux](#description-des-dossiers-principaux)
+  - [Configuration des Dispositions de Clavier](#configuration-des-dispositions-de-clavier)
+  - [Options du Menu](#options-du-menu)
 
 
 
@@ -47,7 +60,7 @@ voir le fichier `Diagramme_des_classes.pdf`
   - Affichage des scores d'efficacité pour chaque disposition évaluée.
 
 - Optimiseur de Disposition de Clavier :
-  - ILIASSSSS
+  - Création de nouvelle disposition de clavier a partir de l'évaluateur et des claviers de base
 
 - Affichage des Dispositions de Clavier Disponibles :
   - Liste des dispositions de clavier disponibles dans le répertoire dédié.
@@ -271,7 +284,7 @@ touche de l’autre main entre les deux
       - `autre_trigramme`: mouvement correct
       - `tout les doitgs du clavier`: depend du pourcentage du doigt utiliser
 3. **Optimiseur de Disposition de Clavier**
-ILIASSSSS
+L'Optimiseur a pour objectif d'optimiser la disposition des touches d'un clavier en utilisant des algorithmes génétiques pour améliorer la disposition des touches d'un clavier, en cherchant à maximiser un score basé sur des fréquences de séquences de caractères.
 
 Le reste des options (de 4 a 7) sont assez explicites et ne demandent aucune manipulation particulière
 
