@@ -6,6 +6,7 @@
 
 - [Participant](#Participant)
 - [Notre Projet](#notre-projet)
+- [Diagramme des classes](#Diagramme-des-classes)
 - [Fonctionnalités](#fonctionnalités)
 - [Installation](#installation)
 - [Intégration des Patron de conceptions](#intégration-des-patron-de-conceptions)
@@ -21,6 +22,7 @@
  - Rayan BELHASSEN
 
 
+
 ## Notre Projet
 Notre projet est concue est conçue pour :
 
@@ -31,6 +33,9 @@ Notre projet est concue est conçue pour :
 3. Optimiser les dispositions de clavier pour améliorer la productivité et réduire la fatigue de frappe. 
 
 Le projet utilise plusieurs patrons de conception pour assurer une architecture adapter et flexible pour  faciliter la maintenance 
+
+## Diagramme des classes
+voir le fichier `Diagramme_des_classes.pdf`
 
 ## Fonctionnalités
 - Analyseur de Fréquence de Suites de Caractères :
