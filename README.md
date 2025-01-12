@@ -60,7 +60,9 @@ voir le fichier `Diagramme_des_classes.pdf`
   - Affichage des scores d'efficacité pour chaque disposition évaluée.
 
 - Optimiseur de Disposition de Clavier :
-  - Création de nouvelle disposition de clavier a partir de l'évaluateur et des claviers de base
+  - générer un clavier optimisé en fonction du corpus donné.
+  - affichage graphique d'un clavier.
+  - écriture du clavier en format JSON.
 
 - Affichage des Dispositions de Clavier Disponibles :
   - Liste des dispositions de clavier disponibles dans le répertoire dédié.
