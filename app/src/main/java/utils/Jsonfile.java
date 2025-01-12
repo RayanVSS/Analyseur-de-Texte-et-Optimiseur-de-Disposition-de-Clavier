@@ -115,4 +115,20 @@ public class Jsonfile<K, V> {
             return null;
         }
     }
+    public static void createJsonFromDisposition(Map<Character, TouchInfo> disposition, String filePath) {
+        Map<String, TouchInfo> dispoMap = new HashMap<>();
+        for (Map.Entry<Character, TouchInfo> entry : disposition.entrySet()) {
+            dispoMap.put(entry.getKey().toString(), entry.getValue());
+        }
+
+        Map<String, Map<String, TouchInfo>> topMap = new HashMap<>();
+        topMap.put("disposition", dispoMap);
+
+        try (FileWriter writer = new FileWriter(filePath)) {
+            gson.toJson(topMap, writer);
+        } catch (IOException e) {
+            System.out.println("Erreur lors de la creation du fichier JSON de disposition du clavier : " + filePath);
+            e.printStackTrace();
+        }
+    }
 }

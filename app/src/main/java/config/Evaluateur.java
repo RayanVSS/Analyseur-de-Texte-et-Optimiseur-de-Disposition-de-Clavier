@@ -64,6 +64,10 @@ public class Evaluateur {
         public String toString() {
             return "Rangee : " + rangee + ", Colonne : " + colonne + ", Doigt : " + doigt + ", Home : " + home + ", Shift : " + shift;
         }
+
+        public boolean memetouches(TouchInfo other) {
+            return this.rangee == other.rangee && this.colonne == other.colonne;
+        }
     }
 
     private HashMap<String, Integer> nGramMap; // Map des n-grammes
@@ -419,15 +423,17 @@ public class Evaluateur {
 
     public double getScoreTotal() {
         double score = 0;
+        double total = 0;
         for (String key : scores.keySet()) {
             if (key.equals("SFB")||key.equals("ciseaux")||key.equals("LSB")||key.equals("alternance")||key.equals("roulement")||key.equals("mauvaise_redirection")||key.equals("redirection")||key.equals("SKS")){
                 score -= scores.get(key);
             }
-            else{
+            else if (!key.equals("inconnu")){
                 score += scores.get(key);
             }
+            total += scores.get(key);
         }
-        return score;
+        return score/total;
     }
 
     public HashMap<String, Integer> getScores() {
