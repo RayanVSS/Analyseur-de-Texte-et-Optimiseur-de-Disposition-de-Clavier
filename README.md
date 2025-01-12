@@ -4,9 +4,9 @@
 
 ## Sommaire
 
-- [Participant](#Participant)
+- [Participant](#participant)
 - [Notre Projet](#notre-projet)
-- [Diagramme des classes](#Diagramme-des-classes)
+- [Diagramme des classes](#diagramme-des-classes)
 - [Fonctionnalités](#fonctionnalités)
 - [Installation](#installation)
 - [Intégration des Patron de conceptions](#intégration-des-patron-de-conceptions)
@@ -20,7 +20,6 @@
 ## Participant
  - Ilias BENCHEIKH
  - Rayan BELHASSEN
-
 
 
 ## Notre Projet
