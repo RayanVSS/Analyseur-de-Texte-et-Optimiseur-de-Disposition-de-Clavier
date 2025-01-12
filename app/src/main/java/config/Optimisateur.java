@@ -5,18 +5,20 @@ import utils.FileCounter;
 import utils.Jsonfile;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.swing.*;
 import java.awt.*;
+
 
 public class Optimisateur {
     
     private HashMap<String, Integer> nGramMap;
-    private static final int TAILLE_POOL = 20;
-    private static final int MAX_ITERATIONS = 10000;
-    private List<DispositionCandidate> pool;
+    private static final int TAILLE_POOL = Integer.MAX_VALUE ;
+    private static final int MAX_ITERATIONS = 100;
+    private ConcurrentLinkedQueue<DispositionCandidate> pool;
     private double scoreInitial;
     private HashMap<Character, Evaluateur.TouchInfo> meilleureDisposition;
-    private double meilleurScore;
+    private final Object lock = new Object();
 
     private class DispositionCandidate implements Comparable<DispositionCandidate> {
         HashMap<Character, Evaluateur.TouchInfo> disposition;
@@ -39,62 +41,103 @@ public class Optimisateur {
             return Double.compare(autre.score, this.score);
         }
     }
+
+    
+    private class MultiOpti implements Runnable {
+        private int nbIterations = 0; 
+
+        @Override
+        public void run() {
+            while (nbIterations < MAX_ITERATIONS) { 
+                synchronized (lock) {
+                    // Attendre si le pool est trop grand
+                    if(pool.size() >= TAILLE_POOL) {
+                       return;
+                    }
+                }
+
+                Random random = new Random();
+                List<DispositionCandidate> poollocal = pool.stream().toList();
+                
+                if (random.nextBoolean()) {
+                    DispositionCandidate nouveau = mutation(poollocal.get(random.nextInt(pool.size())));
+                    addToPool(nouveau);
+                } else {
+                    DispositionCandidate parentA = poollocal.get(random.nextInt(pool.size()));
+                    DispositionCandidate parentB = poollocal.get(random.nextInt(pool.size()));
+                    DispositionCandidate nouveau = croisement(parentA, parentB);
+                    addToPool(nouveau);
+                }
+                nbIterations++;
+            }
+        }
+    }
     
     public Optimisateur(HashMap<String, Integer> nGramMap) {
         this.nGramMap = nGramMap;
-        this.pool = new ArrayList<>();
+        this.pool = new ConcurrentLinkedQueue<>();
     }
     
     public void optimiser() {
         initialise_pool();
-        System.out.println("Score initial: " + scoreInitial);
+        if (pool.isEmpty()) {
+            System.out.println("Une erreur s'est produite lors de l'initialisation de la disposition de base. L'optimisation est annulée.");
+            return;
+        }
 
-        Random random = new Random();
-        for (int i = 0; i < MAX_ITERATIONS; i++) {
-            DispositionCandidate nouveau;
-            
-            if (random.nextBoolean()) {
-                nouveau = mutation(pool.get(random.nextInt(TAILLE_POOL)));
-            } else {
-                nouveau = croisement(
-                    pool.get(random.nextInt(TAILLE_POOL)),
-                    pool.get(random.nextInt(TAILLE_POOL))
-                );
-            }
-            
-            if (pool.size()>=TAILLE_POOL) {
-                pool.remove(pool.size() - 1);
-                pool.add(nouveau);
-            }
-            else {
-                pool.add(nouveau);
-            }
-            Collections.sort(pool);
-            if (pool.get(0).score > meilleurScore) {
-                meilleurScore = pool.get(0).score;
-                meilleureDisposition = pool.get(0).disposition;
-                System.out.println("Iteration " + i + " - Meilleur score: " + pool.get(0).score);
+        System.out.println("Score initial: " + scoreInitial * 100 + "%");
+
+        
+        Thread[] threads = new Thread[Runtime.getRuntime().availableProcessors()];
+        for (int i = 0; i < threads.length; i++) {
+            threads[i] = new Thread(new MultiOpti());
+            threads[i].start();
+        }
+        
+        System.out.println("Attente de la fin de l'optimisation...");
+        for (Thread t : threads) {
+            try {
+                t.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
+       
         ConsoleUtils.clear();
-        DispositionCandidate meilleur = pool.get(0);
-        System.out.println("Meilleur score final: " + meilleur.score);
-        afficherClavier(meilleur.disposition);
+        double scoreFinal = scoreInitial;
+        for (DispositionCandidate disp : pool) {
+            if (disp.score > scoreFinal) {
+                scoreFinal = disp.score;
+                meilleureDisposition = disp.disposition;
+            }
+        }
+
+        System.out.println("Score final: " + scoreFinal * 100 + "%");
+        afficherClavier(meilleureDisposition);
     }
     
     private void initialise_pool() {
         HashMap<Character, Evaluateur.TouchInfo> dispositionDeBase = chargerDispositionDeBase();
-        int random = new Random().nextInt(dispositionDeBase.keySet().size());
-        pool.add(new DispositionCandidate(dispositionDeBase));
-        scoreInitial=pool.get(0).score;
-        for (int i = 0; i < TAILLE_POOL; i++) {
-            HashMap<Character, Evaluateur.TouchInfo> nouvelleDisp = new HashMap<>(dispositionDeBase);
-            for (int j = 0; j < random ; j++) { 
-                permuterDeuxTouchesAleatoires(nouvelleDisp);
-            }
-            pool.add(new DispositionCandidate(nouvelleDisp));
+        if(dispositionDeBase == null) {
+            return;
         }
-        Collections.sort(pool);
+        pool.clear();
+        pool.add(new DispositionCandidate(dispositionDeBase));
+        scoreInitial = pool.peek().score;
+        int random = new Random().nextInt(dispositionDeBase.keySet().size());
+        HashMap<Character, Evaluateur.TouchInfo> nouvelleDisp = new HashMap<>(dispositionDeBase);
+        for (int j = 0; j < random ; j++) { 
+            permuterDeuxTouchesAleatoires(nouvelleDisp);
+        }
+        pool.add(new DispositionCandidate(nouvelleDisp));
+        
+    }
+
+    private void addToPool(DispositionCandidate nouveau) {
+        synchronized(lock) {
+            pool.add(nouveau);
+            lock.notifyAll();
+        }
     }
     
     private DispositionCandidate mutation(DispositionCandidate parent) {
@@ -117,16 +160,67 @@ public class Optimisateur {
         int moitie = touchesRestantes.size() / 2;
         while (enfant.size() < moitie) {
             Character c = touchesRestantes.get(random.nextInt(touchesRestantes.size()));
-            enfant.put(c, parentA.disposition.get(c));
-            nonUtilises.remove(c);
-            touchesRestantes.remove(c);
+            Evaluateur.TouchInfo info = parentA.disposition.get(c);
+    
+            // Vérifier si le caractère est une lettre
+            boolean possible = sansShift(c);
+    
+            // Vérifier si le touch est déjà occupé par un caractère incompatible
+            boolean conflit = false;
+            for (Map.Entry<Character, Evaluateur.TouchInfo> entry : enfant.entrySet()) {
+                if (entry.getValue().equals(info)) {
+                    if (possible != sansShift(entry.getKey())) {
+                        conflit = true;
+                        break;
+                    }
+                }
+            }
+    
+            if (conflit) {
+                continue;
+            }
+    
+            if (possible) {
+                if (!toucheContientLettre(info, enfant) && !info.isShift()) {
+                    enfant.put(c, info);
+                    nonUtilises.remove(c);
+                    touchesRestantes.remove(c);
+                }
+            } else {
+                if (!toucheContientLettre(info, enfant)) {
+                    enfant.put(c, info);
+                    nonUtilises.remove(c);
+                    touchesRestantes.remove(c);
+                }
+            }
         }
     
-        // Ajouter les touches non conflictuelles du parent B
+
         for (Map.Entry<Character, Evaluateur.TouchInfo> entry : nonUtilises.entrySet()) {
             Character c = entry.getKey();
             Evaluateur.TouchInfo info = entry.getValue();
-            if (!enfant.containsValue(info)) {
+            boolean possible = sansShift(c);
+    
+            boolean conflit = false;
+            for (Map.Entry<Character, Evaluateur.TouchInfo> e : enfant.entrySet()) {
+                if (e.getValue().equals(info)) {
+                    if (possible != sansShift(e.getKey())) {
+                        conflit = true;
+                        break;
+                    }
+                }
+            }
+    
+            if (conflit) {
+                continue; // Passer si conflit détecté
+            }
+    
+            if (possible) {
+                if (!enfant.containsValue(info) && !toucheContientLettre(info, enfant) && !info.isShift()) {
+                    enfant.put(c, info);
+                    touchesRestantes.remove(c);
+                }
+            } else if (!enfant.containsValue(info) && !toucheContientLettre(info, enfant)) {
                 enfant.put(c, info);
                 touchesRestantes.remove(c);
             }
@@ -135,7 +229,7 @@ public class Optimisateur {
         // Gérer les touches restantes avec des positions libres
         Set<Evaluateur.TouchInfo> positionsUtilisees = new HashSet<>(enfant.values());
         List<Evaluateur.TouchInfo> positionsLibres = new ArrayList<>();
-        
+    
         // Collecter toutes les positions disponibles de parentA
         for (Evaluateur.TouchInfo info : parentA.disposition.values()) {
             if (!positionsUtilisees.contains(info)) {
@@ -143,12 +237,34 @@ public class Optimisateur {
             }
         }
     
-        // Placer les touches restantes sur des positions libres
         for (Character c : touchesRestantes) {
             if (!positionsLibres.isEmpty()) {
-                int idx = random.nextInt(positionsLibres.size());
-                enfant.put(c, positionsLibres.get(idx));
-                positionsLibres.remove(idx);
+                Evaluateur.TouchInfo originalInfo = parentA.disposition.get(c);
+                List<Evaluateur.TouchInfo> candidates = new ArrayList<>();
+                for (Evaluateur.TouchInfo libre : positionsLibres) {
+                    if (libre.isShift() == originalInfo.isShift()) {
+                        boolean possible = sansShift(c);
+                        boolean compatible = true;
+                        for (Map.Entry<Character, Evaluateur.TouchInfo> e : enfant.entrySet()) {
+                            if (e.getValue().equals(libre)) {
+                                if (possible != sansShift(e.getKey())) {
+                                    compatible = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (compatible) {
+                            candidates.add(libre);
+                        }
+                    }
+                }
+    
+                if (!candidates.isEmpty()) {
+                    int idx = random.nextInt(candidates.size());
+                    Evaluateur.TouchInfo selected = candidates.get(idx);
+                    enfant.put(c, selected);
+                    positionsLibres.remove(selected);
+                }
             }
         }
     
@@ -158,19 +274,41 @@ public class Optimisateur {
     private void permuterDeuxTouchesAleatoires(HashMap<Character, Evaluateur.TouchInfo> disposition) {
         List<Character> touches = new ArrayList<>(disposition.keySet());
         Random random = new Random();
-        
+    
         int index1 = random.nextInt(touches.size());
         int index2 = random.nextInt(touches.size());
-        
+    
         Character touche1 = touches.get(index1);
         Character touche2 = touches.get(index2);
         Evaluateur.TouchInfo info1 = disposition.get(touche1);
         Evaluateur.TouchInfo info2 = disposition.get(touche2);
-        if ((touche1=='↑' && info2.isShift()) || (touche2=='↑' && info1.isShift())) {
-            return;
+    
+        if (info1.isShift() != info2.isShift()) return;
+    
+        boolean possible1 = sansShift(touche1);
+        boolean possible2 = sansShift(touche2);
+    
+        if (possible1 != possible2) return;
+
+        if (possible1) {
+            if (info2.isShift()) return;
         }
+    
         disposition.put(touche1, info2);
         disposition.put(touche2, info1);
+    }
+
+    private boolean sansShift (char c) {
+        return (c >= 'a' && c <= 'z') || c=='↑';
+    }
+
+    private boolean toucheContientLettre(Evaluateur.TouchInfo touchInfo, HashMap<Character, Evaluateur.TouchInfo> disposition) {
+        for (Map.Entry<Character, Evaluateur.TouchInfo> entry : disposition.entrySet()) {
+            if (touchInfo.memetouches(entry.getValue()) && sansShift(entry.getKey())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private HashMap<Character, Evaluateur.TouchInfo> chargerDispositionDeBase() {
@@ -254,8 +392,6 @@ public class Optimisateur {
     
     public void sauvegarderDisposition () {
         String cheminDisposition = FileCounter.getTerminalLocation() + "/resultat/optimise.json";
-        Jsonfile<Character, Evaluateur.TouchInfo> jsonfile = new Jsonfile<>();
-        jsonfile.create_json(meilleureDisposition, cheminDisposition);
+        Jsonfile.createJsonFromDisposition(meilleureDisposition, cheminDisposition);
     }
-
 }
