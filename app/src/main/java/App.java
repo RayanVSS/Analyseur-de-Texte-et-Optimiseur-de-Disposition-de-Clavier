@@ -1,7 +1,6 @@
+import config.Optimisateur;
 import services.*;
 import services.observer.LoggerObserver;
-import services.LoggingFrequencyAnalyzerDecorator;
-import services.IFrequencyAnalyzer;
 import utils.ConsoleUtils;
 
 /**
@@ -16,14 +15,17 @@ public class App {
         FrequencyAnalyzer frequencyAnalyzer = new FrequencyAnalyzer(textDataSource);
         IFrequencyAnalyzer loggingAnalyzer = new LoggingFrequencyAnalyzerDecorator(frequencyAnalyzer);
         KeyboardEvaluator keyboardEvaluator = new KeyboardEvaluator();
+        KeyboardOptimisateur keyboardoptimisateur = new KeyboardOptimisateur();
         TextDisplay textDisplay = new TextDisplay();
         KeyboardDisplay keyboardDisplay = new KeyboardDisplay();
         ResultClearer resultClearer = new ResultClearer();
+        
 
         // Enregistrer un observateur (par exemple, un logger)
         LoggerObserver logger = new LoggerObserver();
         frequencyAnalyzer.registerObserver(logger);
         keyboardEvaluator.registerObserver(logger);
+        keyboardoptimisateur.registerObserver(logger);
 
         do {
             choix = menuHandler.displayMenuAndGetChoice();
@@ -44,7 +46,7 @@ public class App {
 
                 case 3:
                     ConsoleUtils.clear();
-                    System.out.println("🔒 Fonctionnalite à venir.");
+                    keyboardoptimisateur.execute();
                     break;
 
                 case 4:

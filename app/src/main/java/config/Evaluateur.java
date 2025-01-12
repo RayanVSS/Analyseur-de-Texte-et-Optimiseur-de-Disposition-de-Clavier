@@ -52,6 +52,18 @@ public class Evaluateur {
         public boolean isShift() {
             return shift;
         }
+
+        public void setShift(boolean shift) {
+            this.shift = shift;
+        }
+
+        public boolean equals(TouchInfo other) {
+            return this.rangee == other.rangee && this.colonne == other.colonne;
+        }
+
+        public String toString() {
+            return "Rangee : " + rangee + ", Colonne : " + colonne + ", Doigt : " + doigt + ", Home : " + home + ", Shift : " + shift;
+        }
     }
 
     private HashMap<String, Integer> nGramMap; // Map des n-grammes
@@ -92,6 +104,10 @@ public class Evaluateur {
      * NE FAIT PAS L'AFFICHAGE DES SCORES
      */
     public void evaluer() {
+        if (nGramMap == null || disposition == null || nGramMap.isEmpty() || disposition.isEmpty()) {
+            System.out.println("Erreur : n-grammes ou disposition non initialisés");
+            return;
+        }
         for (Map.Entry<String, Integer> entry : nGramMap.entrySet()) {
             String nGram = entry.getKey();
             int freq = entry.getValue();
@@ -141,7 +157,7 @@ public class Evaluateur {
      * Convertit un caractere en sa (ou ses) touche(s) de base.
      * Les modifications pour les majuscules :
      * - Si c est majuscule, on le convertit directement en minuscule
-     * Pour shift=true dans le JSON on ajoute char SHIFT '¤',
+     * Pour shift=true dans le JSON on ajoute char SHIFT '↑',
      */
     private List<Character> convertChar(char c) {
         List<Character> list = new ArrayList<>();
@@ -156,9 +172,9 @@ public class Evaluateur {
             return list;
         }
         // si shift est active pour ce caractere => on ajoute SHIFT en plus
-        // '¤' pour SHIFT
+        // '↑' pour SHIFT
         if (info.isShift()) {
-            list.add('¤');
+            list.add('↑');
         }
         // on ajoute le caractere final
         list.add(c);
@@ -399,6 +415,23 @@ public class Evaluateur {
                     double percent = (double) entry.getValue() / total * 100;
                     System.out.println(entry.getKey() + " : " + String.format("%.2f", percent) + "%");
                 });
+    }
+
+    public double getScoreTotal() {
+        double score = 0;
+        for (String key : scores.keySet()) {
+            if (key.equals("SFB")||key.equals("ciseaux")||key.equals("LSB")||key.equals("alternance")||key.equals("roulement")||key.equals("mauvaise_redirection")||key.equals("redirection")||key.equals("SKS")){
+                score -= scores.get(key);
+            }
+            else{
+                score += scores.get(key);
+            }
+        }
+        return score;
+    }
+
+    public HashMap<String, Integer> getScores() {
+        return scores;
     }
 
 }

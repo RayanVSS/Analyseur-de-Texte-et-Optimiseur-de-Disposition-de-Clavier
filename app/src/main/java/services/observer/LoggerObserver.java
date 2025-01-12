@@ -16,6 +16,17 @@ public class LoggerObserver implements Observer {
             case "KeyboardEvaluated":
                 System.out.println("[Logger] l'analyse de frequence est terminee. clavier utiliser : " + data);
                 break;
+            case "OptimizationKeyBoard":
+                System.out.println("[Logger] Optimisation est terminee.");
+                break;
+
+            case "StatisticsLoaded":
+                System.out.println("[Logger] Statistiques chargees.");
+                break;
+
+            case "StatisticsNotFound":
+                System.out.println("[Logger] Statistiques non trouvees.");
+                break;
             default:
                 System.out.println("[Logger] evenement inconnu : " + eventType);
         }

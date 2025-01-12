@@ -30,7 +30,7 @@ Notre projet est concue est conçue pour :
 
 3. Optimiser les dispositions de clavier pour améliorer la productivité et réduire la fatigue de frappe. 
 
-Le projet utilise plusieurs patrons de conception pour assurer une architecture adapter et flexible pour  facilitant la maintenance 
+Le projet utilise plusieurs patrons de conception pour assurer une architecture adapter et flexible pour  faciliter la maintenance 
 
 ## Fonctionnalités
 - Analyseur de Fréquence de Suites de Caractères :
