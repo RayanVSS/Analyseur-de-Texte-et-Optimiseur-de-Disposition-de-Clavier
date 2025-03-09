@@ -1,7 +1,5 @@
 # Analyseur de Texte et Optimiseur de Disposition de Clavier
 
-# belhassen-bencheikh-projet-cpoo5-24-25
-
 ## Sommaire
 
 - [Analyseur de Texte et Optimiseur de Disposition de Clavier](#analyseur-de-texte-et-optimiseur-de-disposition-de-clavier)
@@ -83,7 +81,7 @@ Gradle pour la gestion des dépendances et la compilation
 Cloner le Répertoire du Projet :
 
 ```bash
-git https://moule.informatique.univ-paris-diderot.fr/belhasse/belhassen-bencheikh-projet-cpoo5-24-25.git
+git clone https://github.com/RayanVSS/Analyseur-de-Texte-et-Optimiseur-de-Disposition-de-Clavier.git
 ```
 
 Naviguer dans le Répertoire du Projet :
